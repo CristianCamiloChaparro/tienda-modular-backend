@@ -58,6 +58,29 @@ public class ProductoService {
         return ProductoResponse.desde(productoRepository.save(producto));
     }
 
+    @Transactional
+    public ProductoResponse actualizarProducto(Long id, ProductoRequest datos) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Producto con id " + id + " no encontrado"));
+        Categoria categoria = categoriaService.buscarEntidad(datos.categoriaId());
+
+        producto.setCategoria(categoria);
+        producto.setNombre(datos.nombre().trim());
+        producto.setDescripcion(limpiar(datos.descripcion()));
+        producto.setPrecio(datos.precio());
+        producto.setStock(datos.stock());
+        producto.setImagenUrl(limpiar(datos.imagenUrl()));
+
+        return ProductoResponse.desde(productoRepository.save(producto));
+    }
+
+    @Transactional
+    public void eliminarProducto(Long id) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Producto con id " + id + " no encontrado"));
+        productoRepository.delete(producto);
+    }
+
     private String limpiar(String texto) {
         return (texto == null || texto.isBlank()) ? null : texto.trim();
     }

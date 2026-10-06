@@ -18,3 +18,5 @@ Thumbs.db
 
 ### Variables locales ###
 .env
+.agents/
+ORIGINAL_REQUEST.md

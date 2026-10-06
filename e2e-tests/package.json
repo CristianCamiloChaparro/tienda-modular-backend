@@ -1,0 +1,25 @@
+{
+  "name": "tienda-modular-e2e-tests",
+  "version": "1.0.0",
+  "description": "Opaque-box E2E test suite for Tienda en Línea Modular (Semana 12)",
+  "type": "module",
+  "scripts": {
+    "test": "node run-all.js",
+    "test:oracle": "node run-all.js --oracle",
+    "test:backend": "node run-all.js --backend",
+    "test:frontend": "node run-all.js --frontend",
+    "test:tier1": "node run-all.js --tier=1",
+    "test:tier2": "node run-all.js --tier=2",
+    "test:tier3": "node run-all.js --tier=3",
+    "test:tier4": "node run-all.js --tier=4"
+  },
+  "keywords": [
+    "e2e",
+    "testing",
+    "spring-boot",
+    "react",
+    "vite"
+  ],
+  "author": "teamwork_preview_test_writer_m3_1",
+  "license": "ISC"
+}

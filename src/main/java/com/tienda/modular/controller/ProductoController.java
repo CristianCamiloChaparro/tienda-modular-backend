@@ -65,4 +65,29 @@ public class ProductoController {
                 .path("/{id}").buildAndExpand(creado.id()).toUri();
         return ResponseEntity.created(ubicacion).body(creado);
     }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Actualizar producto",
+            description = "Actualiza los datos de un producto validando su existencia, la categoria y restricciones de negocio.")
+    @ApiResponse(responseCode = "200", description = "Producto actualizado exitosamente")
+    @ApiResponse(responseCode = "400", description = "Datos invalidos",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
+    @ApiResponse(responseCode = "404", description = "El producto o la categoria no existe",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
+    public ResponseEntity<ProductoResponse> actualizar(
+            @Parameter(description = "Id del producto", example = "1") @PathVariable Long id,
+            @Valid @RequestBody ProductoRequest datos) {
+        return ResponseEntity.ok(productoService.actualizarProducto(id, datos));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar producto", description = "Elimina un producto por su id.")
+    @ApiResponse(responseCode = "204", description = "Producto eliminado exitosamente")
+    @ApiResponse(responseCode = "404", description = "No existe un producto con ese id",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
+    public ResponseEntity<Void> eliminar(
+            @Parameter(description = "Id del producto", example = "1") @PathVariable Long id) {
+        productoService.eliminarProducto(id);
+        return ResponseEntity.noContent().build();
+    }
 }

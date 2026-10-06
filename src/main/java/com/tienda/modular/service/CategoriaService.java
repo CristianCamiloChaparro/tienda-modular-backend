@@ -6,6 +6,7 @@ import com.tienda.modular.exception.RecursoNoEncontradoException;
 import com.tienda.modular.exception.ReglaNegocioException;
 import com.tienda.modular.model.Categoria;
 import com.tienda.modular.repository.CategoriaRepository;
+import com.tienda.modular.repository.ProductoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +16,11 @@ import java.util.List;
 public class CategoriaService {
 
     private final CategoriaRepository categoriaRepository;
+    private final ProductoRepository productoRepository;
 
-    public CategoriaService(CategoriaRepository categoriaRepository) {
+    public CategoriaService(CategoriaRepository categoriaRepository, ProductoRepository productoRepository) {
         this.categoriaRepository = categoriaRepository;
+        this.productoRepository = productoRepository;
     }
 
     @Transactional(readOnly = true)
@@ -41,6 +44,27 @@ public class CategoriaService {
         }
         Categoria categoria = new Categoria(nombre, limpiar(datos.descripcion()));
         return CategoriaResponse.desde(categoriaRepository.save(categoria));
+    }
+
+    @Transactional
+    public CategoriaResponse actualizarCategoria(Long id, CategoriaRequest datos) {
+        Categoria categoria = buscarEntidad(id);
+        String nombre = datos.nombre().trim();
+        if (categoriaRepository.existsByNombreIgnoreCaseAndIdNot(nombre, id)) {
+            throw new ReglaNegocioException("Ya existe una categoria con el nombre '" + nombre + "'");
+        }
+        categoria.setNombre(nombre);
+        categoria.setDescripcion(limpiar(datos.descripcion()));
+        return CategoriaResponse.desde(categoriaRepository.save(categoria));
+    }
+
+    @Transactional
+    public void eliminarCategoria(Long id) {
+        Categoria categoria = buscarEntidad(id);
+        if (productoRepository.existsByCategoriaId(id)) {
+            throw new ReglaNegocioException("No se puede eliminar la categoría porque tiene productos asociados");
+        }
+        categoriaRepository.delete(categoria);
     }
 
     /** Uso interno (ProductoService): obtiene la entidad o lanza 404. */
