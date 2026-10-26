@@ -1,0 +1,37 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  overflow: hidden;
+  background-color: $color-bg-card;
+}
+
+.button {
+  width: 34px;
+  height: 34px;
+  @include flex-center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $color-text-main;
+  transition: background-color $transition-fast;
+
+  &:hover:not(:disabled) {
+    background-color: $color-bg-surface;
+  }
+
+  &:disabled {
+    color: $color-text-light;
+    cursor: not-allowed;
+  }
+}
+
+.value {
+  min-width: 36px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}

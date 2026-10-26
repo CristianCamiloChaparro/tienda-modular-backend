@@ -1,0 +1,156 @@
+@use 'variables' as *;
+@use 'reset';
+@use 'mixins' as *;
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $spacing-md;
+  padding-right: $spacing-md;
+
+  @include respond-to(tablet) {
+    padding-left: $spacing-sm;
+    padding-right: $spacing-sm;
+  }
+}
+
+// ---------- Componentes de interfaz reutilizables ----------
+
+.btn {
+  @include button-base;
+}
+
+.btn-primary {
+  @include button-variant($color-primary, $color-primary-hover);
+}
+
+.btn-secondary {
+  @include button-variant($color-bg-card, $color-bg-surface, $color-text-main, $color-border);
+}
+
+.btn-danger {
+  @include button-variant($color-danger, $color-danger-hover);
+}
+
+.btn-ghost {
+  @include button-variant(transparent, $color-bg-surface, $color-text-muted, transparent);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.panel {
+  @include panel;
+}
+
+.page-header {
+  padding: $spacing-lg 0 $spacing-md;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: $color-text-main;
+
+  @include respond-to(mobile) {
+    font-size: 1.4rem;
+  }
+}
+
+.page-subtitle {
+  color: $color-text-muted;
+  margin-top: $spacing-xs;
+}
+
+.field {
+  @include flex-column;
+  gap: $spacing-xs + 2;
+  margin-bottom: $spacing-md;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $color-text-main;
+  }
+}
+
+.input {
+  @include input-base;
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.field-error {
+  font-size: 0.8rem;
+  color: $color-danger;
+}
+
+.field-hint {
+  font-size: 0.8rem;
+  color: $color-text-muted;
+}
+
+.alert {
+  padding: $spacing-sm + 4 $spacing-md;
+  border-radius: $radius-md;
+  font-size: 0.9rem;
+  margin-bottom: $spacing-md;
+  border: 1px solid transparent;
+
+  &.alert-error {
+    color: $color-danger;
+    background-color: $color-danger-bg;
+    border-color: $color-danger-border;
+  }
+
+  &.alert-info {
+    color: $color-primary;
+    background-color: $color-primary-light;
+    border-color: $color-primary-border;
+  }
+
+  &.alert-success {
+    color: $color-success;
+    background-color: $color-success-bg;
+    border-color: $color-success-border;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

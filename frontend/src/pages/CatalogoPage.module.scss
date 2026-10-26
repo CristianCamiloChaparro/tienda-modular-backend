@@ -1,0 +1,33 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.hero {
+  padding: $spacing-lg 0 $spacing-md;
+
+  @include respond-to(tablet) {
+    padding: $spacing-md 0;
+  }
+}
+
+.heroTitle {
+  font-size: 2rem;
+  font-weight: 800;
+  color: $color-text-main;
+  letter-spacing: -0.03em;
+  margin-bottom: $spacing-xs;
+
+  @include respond-to(mobile) {
+    font-size: 1.5rem;
+  }
+}
+
+.heroDescription {
+  font-size: 1.05rem;
+  color: $color-text-muted;
+  max-width: 640px;
+  line-height: 1.5;
+
+  @include respond-to(mobile) {
+    font-size: 0.95rem;
+  }
+}

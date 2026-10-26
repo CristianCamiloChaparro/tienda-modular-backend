@@ -57,7 +57,7 @@ node e2e-tests/run-all.js --tier=4
 | Variable | Valor por Defecto | Descripción |
 |---|---|---|
 | `API_BASE_URL` | `http://localhost:8080/api/v1` | URL base de la API REST del backend |
-| `FRONTEND_DIR` | `../tienda-modular-frontend` | Directorio raíz del proyecto frontend |
+| `FRONTEND_DIR` | `../frontend` | Directorio raíz del proyecto frontend |
 | `BACKEND_DIR` | `..` | Directorio raíz del proyecto backend |
 | `ORACLE_PORT` | `8089` | Puerto HTTP para el servidor oráculo en modo `--oracle` |
 | `REQUEST_TIMEOUT_MS`| `8000` | Timeout por solicitud HTTP (ms) |

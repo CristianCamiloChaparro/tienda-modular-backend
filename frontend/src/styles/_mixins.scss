@@ -1,0 +1,151 @@
+@use 'variables' as *;
+
+// Media Queries
+@mixin respond-to($bp) {
+  @if $bp == mobile {
+    @media (max-width: #{$bp-mobile}) {
+      @content;
+    }
+  } @else if $bp == tablet {
+    @media (max-width: #{$bp-tablet}) {
+      @content;
+    }
+  } @else if $bp == desktop {
+    @media (min-width: #{$bp-desktop}) {
+      @content;
+    }
+  } @else if $bp == wide {
+    @media (min-width: #{$bp-wide}) {
+      @content;
+    }
+  }
+}
+
+// Flex Helpers
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Line Clamp
+@mixin line-clamp($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Card Box & Hover
+@mixin card-box {
+  background-color: $color-bg-card;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  transition: transform $transition-default, box-shadow $transition-default, border-color $transition-default;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-hover;
+    border-color: $color-border-hover;
+  }
+}
+
+// Shimmer Animation for Skeletons
+@mixin shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 0%,
+    #e2e8f0 50%,
+    #f1f5f9 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite ease-in-out;
+}
+
+// Botones
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs + 2;
+  padding: 10px 18px;
+  border-radius: $radius-md;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  border: 1px solid transparent;
+  transition: background-color $transition-fast, border-color $transition-fast, color $transition-fast;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
+}
+
+@mixin button-variant($bg, $bg-hover, $color: $color-text-inverse, $border: $bg) {
+  background-color: $bg;
+  color: $color;
+  border-color: $border;
+
+  &:hover:not(:disabled) {
+    background-color: $bg-hover;
+  }
+}
+
+// Formularios
+@mixin input-base {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid $color-border;
+  border-radius: $radius-sm;
+  background-color: $color-bg-card;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.15);
+  }
+
+  &[aria-invalid='true'] {
+    border-color: $color-danger;
+  }
+}
+
+// Contenedor tipo tarjeta sin efecto hover
+@mixin panel {
+  background-color: $color-bg-card;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $spacing-lg;
+
+  @include respond-to(mobile) {
+    padding: $spacing-md;
+  }
+}

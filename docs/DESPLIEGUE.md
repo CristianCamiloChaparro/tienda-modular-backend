@@ -8,10 +8,11 @@ Hay tres formas de correr la aplicación completa:
 | B. Docker Compose | Demostración local completa con un comando | Sí (`https://localhost`) |
 | C. Render (nube) | **Sustentación**: URL pública para todo el curso | Sí |
 
-Ambos repositorios deben estar uno al lado del otro:
+Un solo repositorio con dos proyectos independientes:
 ```
 tienda-modular-backend/
-tienda-modular-frontend/
+├── src/, pom.xml, Dockerfile   → backend (Spring Boot)
+└── frontend/                   → frontend (React + Vite), con su propio package.json y Dockerfile
 ```
 
 ---
@@ -26,7 +27,7 @@ cd tienda-modular-backend
 DB_PASSWORD=tu_clave ./mvnw spring-boot:run
 
 # Terminal 2 - frontend (http://localhost:5173)
-cd tienda-modular-frontend
+cd tienda-modular-backend/frontend
 npm install
 npm run dev
 ```
@@ -48,7 +49,7 @@ docker compose up --build
 
 Contenedores: `db` (PostgreSQL 17) → `backend` (Spring Boot) → `frontend` (nginx con la SPA y proxy `/api`) → `https` (Caddy, TLS).
 
-Variables opcionales (archivo `.env` junto al `docker-compose.yml`): `DB_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `FRONTEND_DIR`.
+Variables opcionales (archivo `.env` junto al `docker-compose.yml`): `DB_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
 
 Detener: `docker compose down` (agregar `-v` para borrar también la base de datos).
 
@@ -56,16 +57,18 @@ Detener: `docker compose down` (agregar `-v` para borrar también la base de dat
 
 ## C. Render (URL pública para la sustentación)
 
-1. Subir ambos repositorios a GitHub (el frontend en su propio repositorio).
-2. En `render.yaml` (repositorio del backend) confirmar la URL del repositorio del frontend.
-3. En [render.com](https://render.com): **New → Blueprint** → elegir el repositorio del backend. Render crea:
-   - `tienda-db` (PostgreSQL),
-   - `tienda-backend` (Docker, este repositorio),
-   - `tienda-frontend` (Docker, repositorio del frontend).
-4. Completar las variables que Render pide:
-   - `ADMIN_EMAIL` y `ADMIN_PASSWORD`: credenciales del administrador inicial (usar una contraseña nueva, no la de desarrollo).
-   - `BACKEND_URL` (frontend): la URL pública del backend, por ejemplo `https://tienda-backend.onrender.com`.
-5. Abrir la URL del frontend, por ejemplo `https://tienda-frontend.onrender.com`. Swagger queda en `https://tienda-frontend.onrender.com/api/v1/docs`.
+**Despliegue actual:** backend en https://tienda-backend-8nul.onrender.com (Swagger en `/api/v1/docs`) y frontend en el servicio `tienda-frontend`.
+
+Opción manual (como está desplegado):
+1. **New → Postgres** (plan Free): nombre `tienda-db`, base `tienda_modular`, usuario `tienda`.
+2. **New → Web Service → Public Git Repository** con la URL de este repositorio, plan Free, sin *Root Directory*. Variables: `DB_HOST` (hostname interno de la base), `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `COOKIE_SECURE=true`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
+3. **New → Web Service** con el mismo repositorio y **Root Directory `frontend`**, plan Free. Variable: `BACKEND_URL` = URL pública del backend.
+
+Opción automática: **New → Blueprint** → este repositorio. `render.yaml` crea `tienda-db`, `tienda-backend` y `tienda-frontend` (este último desde la carpeta `frontend/`), y pide:
+- `ADMIN_EMAIL` y `ADMIN_PASSWORD`: credenciales del administrador inicial (usar una contraseña nueva, no la de desarrollo).
+- `BACKEND_URL` (frontend): la URL pública del backend.
+
+En ambos casos se abre la URL del frontend; Swagger también queda disponible en `<url-del-frontend>/api/v1/docs`.
 
 **Notas del plan gratuito**
 - Los servicios se "duermen" tras 15 minutos sin uso; la primera visita tarda ~1 minuto. **Abrir la aplicación unos minutos antes de la sustentación.**

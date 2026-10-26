@@ -1,0 +1,26 @@
+@use 'sass:list';
+@use '../../styles/variables' as *;
+
+.badge {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: $radius-full;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+$estados: (
+  pagado: ($color-primary, $color-primary-light, $color-primary-border),
+  enviado: ($color-warning, $color-warning-bg, $color-warning-border),
+  entregado: ($color-success, $color-success-bg, $color-success-border),
+  cancelado: ($color-danger, $color-danger-bg, $color-danger-border),
+);
+
+@each $nombre, $colores in $estados {
+  .#{$nombre} {
+    color: list.nth($colores, 1);
+    background-color: list.nth($colores, 2);
+    border-color: list.nth($colores, 3);
+  }
+}

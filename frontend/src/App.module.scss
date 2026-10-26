@@ -1,0 +1,26 @@
+@use './styles/variables' as *;
+@use './styles/mixins' as *;
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex-grow: 1;
+  padding: $spacing-md 0 $spacing-2xl;
+}
+
+.footer {
+  border-top: 1px solid $color-border;
+  background-color: $color-bg-card;
+  padding: $spacing-md 0;
+  font-size: 0.8rem;
+  color: $color-text-muted;
+
+  a {
+    color: $color-primary;
+    font-weight: 600;
+  }
+}

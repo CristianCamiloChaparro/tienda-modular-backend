@@ -1,0 +1,58 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.empty {
+  @include flex-column;
+  align-items: flex-start;
+  gap: $spacing-md;
+}
+
+.list {
+  @include flex-column;
+  gap: $spacing-md;
+  padding-bottom: $spacing-2xl;
+}
+
+.pedido {
+  @include flex-column;
+  gap: $spacing-sm + 4;
+}
+
+.nuevo {
+  border-color: $color-success-border;
+  box-shadow: 0 0 0 3px rgba($color-success, 0.15);
+}
+
+.head {
+  @include flex-between;
+  align-items: flex-start;
+  gap: $spacing-sm;
+}
+
+.numero {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.meta {
+  font-size: 0.8rem;
+  color: $color-text-muted;
+}
+
+.items {
+  @include flex-column;
+  gap: $spacing-xs;
+
+  li {
+    @include flex-between;
+    font-size: 0.9rem;
+  }
+}
+
+.foot {
+  @include flex-between;
+  gap: $spacing-sm;
+  border-top: 1px solid $color-border;
+  padding-top: $spacing-sm + 4;
+  font-size: 1.05rem;
+}

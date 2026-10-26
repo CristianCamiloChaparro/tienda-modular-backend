@@ -1,0 +1,44 @@
+# Plantilla: la imagen oficial de nginx reemplaza ${PORT} y ${BACKEND_URL} al arrancar.
+
+# Si llega detras de otro proxy con TLS (Render, Caddy) se conserva el esquema original.
+map $http_x_forwarded_proto $proto_original {
+    default $http_x_forwarded_proto;
+    ''      $scheme;
+}
+
+server {
+    listen ${PORT};
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+    server_tokens off;
+
+    # ---------- Cabeceras de seguridad ----------
+    # CSP: solo se ejecutan scripts propios; bloquea scripts inyectados (XSS) y el uso en iframes.
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # ---------- API: mismo origen que el frontend ----------
+    # El navegador solo habla con este dominio; nginx reenvia /api al backend.
+    location /api/ {
+        proxy_pass ${BACKEND_URL};
+        proxy_ssl_server_name on;
+        proxy_set_header Host $proxy_host;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Proto $proto_original;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # Archivos con hash en el nombre: se pueden cachear mucho tiempo.
+    location /assets/ {
+        expires 1y;
+        try_files $uri =404;
+    }
+
+    # SPA: cualquier ruta (/carrito, /admin...) la resuelve React Router.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

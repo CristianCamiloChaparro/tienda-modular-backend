@@ -1,0 +1,41 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.wrapper {
+  @include flex-center;
+  padding-top: $spacing-2xl;
+  padding-bottom: $spacing-2xl;
+
+  @include respond-to(mobile) {
+    padding-top: $spacing-lg;
+  }
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  color: $color-text-muted;
+  font-size: 0.9rem;
+  margin: $spacing-xs 0 $spacing-lg;
+}
+
+.switch {
+  margin-top: $spacing-md;
+  text-align: center;
+  font-size: 0.875rem;
+  color: $color-text-muted;
+
+  a {
+    color: $color-primary;
+    font-weight: 600;
+  }
+}

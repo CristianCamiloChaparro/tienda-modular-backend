@@ -1,0 +1,100 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.container {
+  @include flex-center;
+  padding: $spacing-2xl $spacing-md;
+}
+
+.card {
+  max-width: 580px;
+  width: 100%;
+  background-color: $color-bg-card;
+  border: 1px solid $color-danger-border;
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  text-align: center;
+  box-shadow: $shadow-md;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.iconWrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: $radius-full;
+  background-color: $color-danger-bg;
+  color: $color-danger;
+  @include flex-center;
+  margin-bottom: $spacing-md;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+}
+
+.title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: $color-text-main;
+  margin-bottom: $spacing-xs;
+}
+
+.description {
+  font-size: 0.95rem;
+  color: $color-text-muted;
+  line-height: 1.5;
+  margin-bottom: $spacing-md;
+}
+
+.codeBlock {
+  background-color: $color-bg-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  font-family: $font-family-mono;
+  font-size: 0.85rem;
+  color: $color-danger;
+  margin-bottom: $spacing-lg;
+  word-break: break-all;
+  max-width: 100%;
+}
+
+.helpTip {
+  background-color: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  font-size: 0.825rem;
+  color: #92400e;
+  margin-bottom: $spacing-lg;
+  text-align: left;
+  line-height: 1.4;
+
+  strong {
+    display: block;
+    margin-bottom: 2px;
+  }
+}
+
+.retryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  background-color: $color-primary;
+  color: $color-text-inverse;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 10px 24px;
+  border-radius: $radius-full;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  transition: all $transition-default;
+
+  &:hover {
+    background-color: $color-primary-hover;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}

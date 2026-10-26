@@ -1,0 +1,44 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.region {
+  position: fixed;
+  right: $spacing-md;
+  bottom: $spacing-md;
+  z-index: 100;
+  @include flex-column;
+  gap: $spacing-sm;
+  max-width: min(360px, calc(100vw - #{$spacing-xl}));
+}
+
+.toast {
+  padding: $spacing-sm + 4 $spacing-md;
+  border-radius: $radius-md;
+  box-shadow: $shadow-lg;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  animation: entrar 0.2s ease-out;
+}
+
+@each $tipo, $color, $fondo, $borde in (exito, $color-success, $color-success-bg, $color-success-border),
+  (error, $color-danger, $color-danger-bg, $color-danger-border),
+  (info, $color-primary, $color-primary-light, $color-primary-border)
+{
+  .#{$tipo} {
+    color: $color;
+    background-color: $fondo;
+    border-color: $borde;
+  }
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,6 +1,6 @@
 # Tienda en Línea Modular — Backend (API REST)
 
-Backend desacoplado del proyecto **Tienda en Línea Modular**. Expone datos en JSON (no renderiza vistas) y está documentado con OpenAPI / Swagger UI. El frontend vive en su propio repositorio: [`tienda-modular-frontend`](../tienda-modular-frontend).
+Backend desacoplado del proyecto **Tienda en Línea Modular**. Expone datos en JSON (no renderiza vistas) y está documentado con OpenAPI / Swagger UI. El frontend es un proyecto independiente dentro de la carpeta [`frontend/`](frontend) de este mismo repositorio: tiene su propio `package.json`, build y contenedor, y solo se comunica con el backend por la API.
 
 **Equipo:** Gustavo Andrés Núñez Vega y Cristian Camilo Chaparro
 

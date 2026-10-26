@@ -37,8 +37,8 @@ services:
     name: tienda-frontend
     runtime: docker
     plan: free
-    # Cambiar por la URL del repositorio del frontend
-    repo: https://github.com/CristianCamiloChaparro/tienda-modular-frontend
+    # Proyecto independiente dentro de este mismo repositorio
+    rootDir: frontend
     envVars:
       # URL publica del backend, ej. https://tienda-backend.onrender.com
       - key: BACKEND_URL

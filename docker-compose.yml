@@ -5,8 +5,7 @@
 #  -> https://localhost        (frontend + API detras de HTTPS)
 #  -> https://localhost/api/v1/docs  (Swagger)
 #
-#  Requiere el frontend clonado al lado de este proyecto:
-#    ../tienda-modular-frontend   (o definir FRONTEND_DIR)
+#  El frontend se construye desde la carpeta ./frontend
 # ==========================================================
 services:
   db:
@@ -36,7 +35,7 @@ services:
         condition: service_healthy
 
   frontend:
-    build: ${FRONTEND_DIR:-../tienda-modular-frontend}
+    build: ./frontend
     environment:
       BACKEND_URL: http://backend:8080
     depends_on:

@@ -19,7 +19,7 @@ export const CONFIG = {
 
   // Project Directories
   BACKEND_DIR: process.env.BACKEND_DIR || path.resolve(__dirname, '..'),
-  FRONTEND_DIR: process.env.FRONTEND_DIR || path.resolve(__dirname, '../../tienda-modular-frontend'),
+  FRONTEND_DIR: process.env.FRONTEND_DIR || path.resolve(__dirname, '../frontend'),
   
   // Administrador con el que se prueban las operaciones de escritura (rol ADMIN)
   ADMIN_EMAIL: process.env.E2E_ADMIN_EMAIL || 'admin@tienda.com',

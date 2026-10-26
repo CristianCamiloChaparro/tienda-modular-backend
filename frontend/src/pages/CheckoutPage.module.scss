@@ -1,0 +1,75 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: $spacing-lg;
+  align-items: start;
+  padding-bottom: $spacing-2xl;
+
+  @include respond-to(tablet) {
+    grid-template-columns: 1fr;
+
+    .summary {
+      order: -1;
+    }
+  }
+}
+
+.empty {
+  @include flex-column;
+  align-items: flex-start;
+  gap: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: $spacing-sm 0 $spacing-md;
+}
+
+.cardRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-sm + 4;
+}
+
+.summary {
+  position: sticky;
+  top: 96px;
+}
+
+.lines {
+  @include flex-column;
+  gap: $spacing-sm;
+}
+
+.line {
+  @include flex-between;
+  gap: $spacing-sm;
+  font-size: 0.9rem;
+  color: $color-text-muted;
+}
+
+.total {
+  @include flex-between;
+  margin-top: $spacing-md;
+  padding-top: $spacing-sm + 4;
+  border-top: 1px solid $color-border;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.volver {
+  display: block;
+  margin-top: $spacing-md;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $color-primary;
+}
+
+code {
+  font-family: $font-family-mono;
+  font-size: 0.85em;
+}

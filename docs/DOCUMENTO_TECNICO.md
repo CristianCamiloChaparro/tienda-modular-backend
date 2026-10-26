@@ -1,7 +1,7 @@
 # Documento técnico — Tienda en Línea Modular
 
 **Equipo:** Gustavo Andrés Núñez Vega y Cristian Camilo Chaparro
-**Repositorios:** `tienda-modular-backend` (API REST) · `tienda-modular-frontend` (SPA)
+**Repositorio:** `tienda-modular-backend` — backend (API REST) en la raíz y frontend (SPA) en `frontend/`
 
 ---
 
@@ -56,7 +56,7 @@ Un pequeño negocio vende sus productos publicando fotos sueltas en redes social
 
 | Código | Requerimiento | Cómo se cumple |
 |---|---|---|
-| RNF-01 | Separación backend/frontend | Dos proyectos y repositorios; el backend solo responde JSON |
+| RNF-01 | Separación backend/frontend | Dos proyectos independientes (raíz y `frontend/`), cada uno con su build, dependencias y contenedor; el backend solo responde JSON |
 | RNF-02 | Seguridad | HTTPS, CSP + limpieza de HTML (XSS), token CSRF, BCrypt, sesiones HttpOnly, roles |
 | RNF-03 | Documentación de la API | OpenAPI 3 + Swagger UI en `/api/v1/docs` |
 | RNF-04 | Integridad de datos | Restricciones en BD (`CHECK`, `UNIQUE`, FK), transacciones y bloqueo de fila en el pago |
@@ -246,7 +246,7 @@ Se trabajó con un esquema **incremental por iteraciones semanales** inspirado e
 | # | Criterio | Evidencia |
 |---|---|---|
 | 1 | Definición y planeación documentadas | Este documento (secciones 1–9) |
-| 2 | Separación real de backend y frontend | Dos repositorios; el backend no tiene vistas (la raíz redirige a Swagger); el frontend solo usa `fetch` contra `/api/v1` |
+| 2 | Separación real de backend y frontend | Dos proyectos con build y despliegue propios (dos servicios en Render); el backend no tiene vistas (la raíz redirige a Swagger); el frontend solo usa `fetch` contra `/api/v1` |
 | 3 | CRUD de categorías y productos | Admin › Productos / Categorías: cada acción llama a la API y actualiza la lista sin recargar la página |
 | 4 | Panel de administrador funcional | Formulario con categoría, precio, stock e imagen con vista previa; validaciones con mensajes en español |
 | 5 | Carrito operativo | El total lo calcula la API en cada agregar/modificar/quitar (prueba de integración `flujoCompletoDeCompra`) |
