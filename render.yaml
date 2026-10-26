@@ -1,0 +1,45 @@
+# ==========================================================
+#  Blueprint de Render: base de datos + backend + frontend
+#  Render -> New -> Blueprint -> seleccionar este repositorio.
+#  Ver docs/DESPLIEGUE.md para el paso a paso.
+# ==========================================================
+databases:
+  - name: tienda-db
+    plan: free
+    databaseName: tienda_modular
+    user: tienda
+
+services:
+  - type: web
+    name: tienda-backend
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/v1/categorias
+    envVars:
+      - key: DB_HOST
+        fromDatabase: { name: tienda-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: tienda-db, property: port }
+      - key: DB_NAME
+        fromDatabase: { name: tienda-db, property: database }
+      - key: DB_USER
+        fromDatabase: { name: tienda-db, property: user }
+      - key: DB_PASSWORD
+        fromDatabase: { name: tienda-db, property: password }
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+
+  - type: web
+    name: tienda-frontend
+    runtime: docker
+    plan: free
+    # Cambiar por la URL del repositorio del frontend
+    repo: https://github.com/CristianCamiloChaparro/tienda-modular-frontend
+    envVars:
+      # URL publica del backend, ej. https://tienda-backend.onrender.com
+      - key: BACKEND_URL
+        sync: false

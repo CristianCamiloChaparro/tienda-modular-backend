@@ -1,6 +1,7 @@
 package com.tienda.modular.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tienda.modular.config.SecurityConfig;
 import com.tienda.modular.dto.ProductoRequest;
 import com.tienda.modular.dto.ProductoResponse;
 import com.tienda.modular.exception.GlobalExceptionHandler;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,11 +26,13 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProductoController.class)
-@Import(GlobalExceptionHandler.class)
+@Import({GlobalExceptionHandler.class, SecurityConfig.class})
 class ProductoControllerTest {
 
     @Autowired
@@ -146,7 +150,7 @@ class ProductoControllerTest {
 
         when(productoService.crearProducto(any(ProductoRequest.class))).thenReturn(response);
 
-        mockMvc.perform(post("/api/v1/productos")
+        mockMvc.perform(post("/api/v1/productos").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -165,7 +169,7 @@ class ProductoControllerTest {
                 new BigDecimal("0.00"), 10, null
         );
 
-        mockMvc.perform(post("/api/v1/productos")
+        mockMvc.perform(post("/api/v1/productos").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -183,7 +187,7 @@ class ProductoControllerTest {
                 new BigDecimal("25000.00"), -1, null
         );
 
-        mockMvc.perform(post("/api/v1/productos")
+        mockMvc.perform(post("/api/v1/productos").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -201,7 +205,7 @@ class ProductoControllerTest {
                 new BigDecimal("25000.00"), 10, null
         );
 
-        mockMvc.perform(post("/api/v1/productos")
+        mockMvc.perform(post("/api/v1/productos").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -222,7 +226,7 @@ class ProductoControllerTest {
         when(productoService.crearProducto(any(ProductoRequest.class)))
                 .thenThrow(new RecursoNoEncontradoException("Categoria con id 99 no encontrada"));
 
-        mockMvc.perform(post("/api/v1/productos")
+        mockMvc.perform(post("/api/v1/productos").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
@@ -243,7 +247,7 @@ class ProductoControllerTest {
 
         when(productoService.actualizarProducto(eq(1L), any(ProductoRequest.class))).thenReturn(response);
 
-        mockMvc.perform(put("/api/v1/productos/1")
+        mockMvc.perform(put("/api/v1/productos/1").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -263,7 +267,7 @@ class ProductoControllerTest {
                 new BigDecimal("0.00"), 10, null
         );
 
-        mockMvc.perform(put("/api/v1/productos/1")
+        mockMvc.perform(put("/api/v1/productos/1").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -281,7 +285,7 @@ class ProductoControllerTest {
                 new BigDecimal("25000.00"), -5, null
         );
 
-        mockMvc.perform(put("/api/v1/productos/1")
+        mockMvc.perform(put("/api/v1/productos/1").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -299,7 +303,7 @@ class ProductoControllerTest {
                 new BigDecimal("25000.00"), 10, null
         );
 
-        mockMvc.perform(put("/api/v1/productos/1")
+        mockMvc.perform(put("/api/v1/productos/1").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -320,7 +324,7 @@ class ProductoControllerTest {
         when(productoService.actualizarProducto(eq(99L), any(ProductoRequest.class)))
                 .thenThrow(new RecursoNoEncontradoException("Producto con id 99 no encontrado"));
 
-        mockMvc.perform(put("/api/v1/productos/99")
+        mockMvc.perform(put("/api/v1/productos/99").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
@@ -341,7 +345,7 @@ class ProductoControllerTest {
         when(productoService.actualizarProducto(eq(1L), any(ProductoRequest.class)))
                 .thenThrow(new RecursoNoEncontradoException("Categoria con id 99 no encontrada"));
 
-        mockMvc.perform(put("/api/v1/productos/1")
+        mockMvc.perform(put("/api/v1/productos/1").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
@@ -356,7 +360,7 @@ class ProductoControllerTest {
     void eliminar_cuandoExiste_retorna204() throws Exception {
         doNothing().when(productoService).eliminarProducto(1L);
 
-        mockMvc.perform(delete("/api/v1/productos/1"))
+        mockMvc.perform(delete("/api/v1/productos/1").with(comoAdmin()))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));
 
@@ -369,11 +373,16 @@ class ProductoControllerTest {
         doThrow(new RecursoNoEncontradoException("Producto con id 99 no encontrado"))
                 .when(productoService).eliminarProducto(99L);
 
-        mockMvc.perform(delete("/api/v1/productos/99"))
+        mockMvc.perform(delete("/api/v1/productos/99").with(comoAdmin()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status", is(404)))
                 .andExpect(jsonPath("$.mensaje", is("Producto con id 99 no encontrado")));
 
         verify(productoService).eliminarProducto(99L);
+    }
+
+    /** Las operaciones de escritura requieren rol ADMIN y token CSRF. */
+    private static RequestPostProcessor comoAdmin() {
+        return request -> csrf().postProcessRequest(user("admin").roles("ADMIN").postProcessRequest(request));
     }
 }

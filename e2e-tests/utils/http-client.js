@@ -1,5 +1,8 @@
 /**
  * Zero-dependency HTTP Client for E2E API Verification
+ *
+ * Se comporta como un navegador: guarda las cookies (sesion JSESSIONID y XSRF-TOKEN)
+ * y envia la cabecera X-XSRF-TOKEN en POST/PUT/PATCH/DELETE, como exige el backend.
  */
 
 import { CONFIG } from '../config.js';
@@ -7,6 +10,31 @@ import { CONFIG } from '../config.js';
 export class HttpClient {
   constructor(baseUrl = CONFIG.API_BASE_URL) {
     this.baseUrl = baseUrl.replace(/\/$/, '');
+    this.cookies = new Map();
+  }
+
+  guardarCookies(response) {
+    const lista = typeof response.headers.getSetCookie === 'function' ? response.headers.getSetCookie() : [];
+    for (const cookie of lista) {
+      const [par] = cookie.split(';');
+      const indice = par.indexOf('=');
+      const nombre = par.slice(0, indice).trim();
+      const valor = par.slice(indice + 1).trim();
+      if (valor) {
+        this.cookies.set(nombre, valor);
+      } else {
+        this.cookies.delete(nombre);
+      }
+    }
+  }
+
+  cabeceraCookie() {
+    return [...this.cookies.entries()].map(([k, v]) => `${k}=${v}`).join('; ');
+  }
+
+  /** Inicia sesion como administrador (necesario para crear/editar/eliminar). */
+  async iniciarSesionAdmin(email = CONFIG.ADMIN_EMAIL, password = CONFIG.ADMIN_PASSWORD) {
+    return this.request('POST', '/auth/login', { email, password });
   }
 
   async request(method, pathOrUrl, body = null, customHeaders = {}) {
@@ -14,8 +42,23 @@ export class HttpClient {
       ? pathOrUrl
       : `${this.baseUrl}${pathOrUrl.startsWith('/') ? '' : '/'}${pathOrUrl}`;
 
+    const modifica = !['GET', 'HEAD', 'OPTIONS'].includes(method);
+    if (modifica && !this.cookies.has('XSRF-TOKEN')) {
+      try {
+        const r = await fetch(`${this.baseUrl}/auth/csrf`, {
+          headers: { Cookie: this.cabeceraCookie() },
+          signal: AbortSignal.timeout(CONFIG.REQUEST_TIMEOUT_MS),
+        });
+        this.guardarCookies(r);
+      } catch {
+        // Servidor sin endpoint CSRF (p. ej. el oraculo): se continua sin token.
+      }
+    }
+
     const headers = {
       'Accept': 'application/json, text/plain, */*',
+      ...(this.cookies.size > 0 ? { Cookie: this.cabeceraCookie() } : {}),
+      ...(modifica && this.cookies.has('XSRF-TOKEN') ? { 'X-XSRF-TOKEN': this.cookies.get('XSRF-TOKEN') } : {}),
       ...customHeaders,
     };
 
@@ -51,6 +94,7 @@ export class HttpClient {
     }
 
     const durationMs = Date.now() - t0;
+    this.guardarCookies(response);
     const rawText = await response.text();
     let parsedBody = null;
     try {

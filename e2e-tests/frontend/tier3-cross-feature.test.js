@@ -59,9 +59,16 @@ export async function runTier3Frontend(reporter) {
       content.includes('categoriaId') || content.includes('categoria'),
       'api.ts debe soportar filtro por categoriaId'
     );
+    // La URL base vive en el cliente HTTP compartido (http.ts), que tambien gestiona el token CSRF.
+    const httpServicePath = path.join(frontendDir, 'src', 'services', 'http.ts');
+    const httpContent = fs.existsSync(httpServicePath) ? fs.readFileSync(httpServicePath, 'utf-8') : '';
     assert.ok(
-      content.includes('8080') || content.includes('VITE_API_BASE_URL'),
-      'api.ts debe apuntar al puerto 8080 o variable de entorno VITE_API_BASE_URL'
+      [content, httpContent].some((c) => c.includes('VITE_API_BASE_URL') || c.includes('8080')),
+      'El cliente de la API debe usar la variable de entorno VITE_API_BASE_URL'
+    );
+    assert.ok(
+      httpContent.includes('X-XSRF-TOKEN'),
+      'http.ts debe enviar el token CSRF en la cabecera X-XSRF-TOKEN'
     );
 
     reporter.pass('F7/F8 Integration: Servicio api.ts encapsula endpoints y soporta filtrado por categoria');

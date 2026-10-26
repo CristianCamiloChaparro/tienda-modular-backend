@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 /**
- * Linea del carrito: un producto con su cantidad y el precio unitario congelado
- * al momento de agregarlo. Tabla: items_carrito
+ * Linea del carrito: un producto con su cantidad y el precio unitario vigente.
+ * Tabla: items_carrito
  */
 @Entity
 @Table(name = "items_carrito",
@@ -53,6 +53,10 @@ public class ItemCarrito {
             throw new IllegalArgumentException("La cantidad debe ser al menos 1");
         }
         this.cantidad = nuevaCantidad;
+    }
+
+    public void sincronizarPrecio() {
+        this.precioUnitario = producto.getPrecio();
     }
 
     public Long getId() { return id; }

@@ -1,63 +1,101 @@
 # Tienda en Línea Modular — Backend (API REST)
 
-Backend desacoplado del proyecto **Tienda en Línea Modular**. Expone datos en JSON (no renderiza vistas) y está documentado con OpenAPI / Swagger UI.
+Backend desacoplado del proyecto **Tienda en Línea Modular**. Expone datos en JSON (no renderiza vistas) y está documentado con OpenAPI / Swagger UI. El frontend vive en su propio repositorio: [`tienda-modular-frontend`](../tienda-modular-frontend).
 
 **Equipo:** Gustavo Andrés Núñez Vega y Cristian Camilo Chaparro
-**Entrega:** Semana 11 — Modelos, conexión a base de datos y primeros endpoints
+
+| Documento | Contenido |
+|---|---|
+| [docs/DOCUMENTO_TECNICO.md](docs/DOCUMENTO_TECNICO.md) | Problema, objetivos, alcance, requerimientos, modelo de datos, arquitectura, metodología, pruebas y criterios de aceptación |
+| [docs/SEGURIDAD.md](docs/SEGURIDAD.md) | HTTPS, XSS y CSRF con un caso demostrable para cada uno |
+| [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md) | Desarrollo local, Docker Compose con HTTPS y despliegue en Render |
+
+## Funcionalidades
+
+- **Catálogo:** CRUD de categorías y productos; listado público con filtro por categoría.
+- **Carrito:** agregar, quitar, modificar cantidades y total calculado por el servidor, validando stock.
+- **Usuarios:** registro, inicio y cierre de sesión; roles `ADMIN` y `CLIENTE`.
+- **Pagos:** checkout con pasarela de pagos en modo prueba, descuento de inventario y registro del pedido.
+- **Pedidos:** historial del cliente; el administrador ve todos y cambia su estado.
+- **Seguridad:** sesiones HttpOnly, CSRF, limpieza de HTML (XSS), CSP, HSTS, BCrypt y reglas por rol.
 
 ## Tecnologías
 
 | Capa | Tecnología |
 |---|---|
 | Lenguaje | Java 21 |
-| Framework | Spring Boot 3.5 (Web, Data JPA, Validation) |
+| Framework | Spring Boot 3.5 (Web, Data JPA, Validation, Security) |
 | ORM | Hibernate / JPA |
-| Base de datos | PostgreSQL 17 |
+| Base de datos | PostgreSQL 17 (H2 solo en pruebas) |
 | Documentación | springdoc-openapi 2.8 (OpenAPI 3 + Swagger UI) |
-| Build | Maven |
+| Seguridad | Spring Security 6, BCrypt, jsoup (limpieza XSS) |
+| Build | Maven (wrapper `./mvnw`) |
+| Contenedores | Docker, Docker Compose, Render |
 
 ## Estructura
 
 ```
 src/main/java/com/tienda/modular
-├── config/        OpenAPI, CORS y carga de datos de ejemplo
+├── config/        Seguridad, autenticación, OpenAPI, CORS, HTTPS y datos iniciales
 ├── controller/    Controladores REST (/api/v1/...)
 ├── dto/           Objetos de entrada/salida con validaciones
 ├── exception/     Errores JSON uniformes (ApiError)
-├── model/         Entidades JPA: Categoria, Producto, Carrito, ItemCarrito
+├── model/         Entidades JPA: Categoria, Producto, Carrito, ItemCarrito, Usuario, Pedido, ItemPedido
 ├── repository/    Repositorios Spring Data JPA
-└── service/       Lógica de negocio
+├── security/      Usuario autenticado, CSRF para SPA y errores 401/403 en JSON
+├── service/       Lógica de negocio (+ service/pago: pasarela de pagos)
+└── util/          TextoSeguro (mitigación XSS)
 ```
 
 ## Cómo ejecutarlo
 
-1. Tener PostgreSQL corriendo y crear la base `tienda_modular` (en pgAdmin: *Databases → Create → Database*).
-2. Abrir la carpeta en IntelliJ (se detecta como proyecto Maven).
-3. Configurar la contraseña de PostgreSQL: en *Run → Edit Configurations → Environment variables* agregar `DB_PASSWORD=tu_contraseña`. Si tu usuario no es `postgres` agrega también `DB_USER`.
-4. Ejecutar `TiendaModularApplication`.
-5. Abrir **http://localhost:8080/api/v1/docs** (Swagger UI).
+1. Tener PostgreSQL corriendo y crear la base `tienda_modular`.
+2. Ejecutar (o abrir en IntelliJ y correr `TiendaModularApplication` con la variable `DB_PASSWORD`):
+   ```bash
+   DB_PASSWORD=tu_contraseña ./mvnw spring-boot:run
+   ```
+3. Abrir **http://localhost:8080/api/v1/docs** (Swagger UI).
 
-Al primer arranque Hibernate crea las tablas y se cargan 3 categorías y 6 productos de ejemplo.
+En el primer arranque Hibernate crea las tablas y se cargan 3 categorías, 6 productos y el administrador inicial.
 
-## Variables de entorno
+Para todo junto (base de datos, backend, frontend y HTTPS) con Docker: `docker compose up --build` y abrir https://localhost. Detalles en [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md).
 
-| Variable | Por defecto | Uso |
-|---|---|---|
-| `DB_URL` | `jdbc:postgresql://localhost:5432/tienda_modular` | URL JDBC |
-| `DB_USER` | `postgres` | Usuario |
-| `DB_PASSWORD` | `postgres` | Contraseña |
-| `PORT` | `8080` | Puerto HTTP |
-| `CORS_ORIGINS` | `http://localhost:5173` | Origen permitido del frontend |
+### Cuentas para probar
 
-## Endpoints (Semana 11)
+| Rol | Cómo obtenerla |
+|---|---|
+| Administrador | Variables `ADMIN_EMAIL` / `ADMIN_PASSWORD` (en desarrollo, los valores por defecto de `application.properties`) |
+| Cliente | Crear una cuenta desde la página *Crear cuenta* o con `POST /api/v1/auth/registro` |
 
-| Método | Ruta | Descripción | Respuestas |
+**Tarjetas de prueba de la pasarela:** `4242 4242 4242 4242` aprobada · `4000 0000 0000 0002` rechazada (fondos insuficientes). Cualquier CVV y una fecha futura.
+
+## Endpoints
+
+| Método | Ruta | Acceso | Descripción |
 |---|---|---|---|
-| GET | `/api/v1/categorias` | Listar categorías | 200 |
-| GET | `/api/v1/categorias/{id}` | Obtener categoría | 200, 404 |
-| POST | `/api/v1/categorias` | Crear categoría | 201, 400, 409 |
-| GET | `/api/v1/productos?categoriaId=` | Listar productos (filtro opcional) | 200, 404 |
-| GET | `/api/v1/productos/{id}` | Obtener producto | 200, 404 |
-| POST | `/api/v1/productos` | Crear producto | 201, 400, 404 |
+| GET | `/api/v1/categorias` · `/{id}` | Público | Listar / obtener categorías |
+| POST · PUT · DELETE | `/api/v1/categorias` · `/{id}` | ADMIN | Crear / editar / eliminar (409 si tiene productos) |
+| GET | `/api/v1/productos?categoriaId=` · `/{id}` | Público | Listar (filtro opcional) / obtener |
+| POST · PUT · DELETE | `/api/v1/productos` · `/{id}` | ADMIN | Crear / editar / eliminar |
+| POST | `/api/v1/carritos` | Público | Crear carrito |
+| GET | `/api/v1/carritos/{id}` | Público | Ver carrito con total |
+| POST | `/api/v1/carritos/{id}/items` | Público | Agregar producto |
+| PUT · DELETE | `/api/v1/carritos/{id}/items/{productoId}` | Público | Modificar cantidad / quitar |
+| DELETE | `/api/v1/carritos/{id}/items` | Público | Vaciar |
+| GET | `/api/v1/auth/csrf` | Público | Emitir cookie `XSRF-TOKEN` |
+| GET | `/api/v1/auth/me` | Público | Usuario con sesión (204 si no hay) |
+| POST | `/api/v1/auth/registro` · `/login` · `/logout` | Público | Cuenta y sesión |
+| POST | `/api/v1/pedidos` | Con sesión | Pagar el carrito (checkout) |
+| GET | `/api/v1/pedidos/mios` · `/{id}` | Con sesión | Mis pedidos / detalle |
+| GET | `/api/v1/pedidos` | ADMIN | Todos los pedidos |
+| PATCH | `/api/v1/pedidos/{id}/estado` | ADMIN | Cambiar estado |
 
-Edición y eliminación (PUT/DELETE) se completan en la Semana 12; el carrito en la Semana 13.
+Toda petición `POST`, `PUT`, `PATCH` o `DELETE` debe llevar la cabecera `X-XSRF-TOKEN` con el valor de la cookie `XSRF-TOKEN`. Swagger UI la envía automáticamente.
+
+## Pruebas
+
+```bash
+./mvnw test
+```
+
+Incluye pruebas unitarias, de controladores (MockMvc) y de integración con Spring Boot + H2 que recorren el flujo completo con sesión y token CSRF reales. Ver la sección 11 del [documento técnico](docs/DOCUMENTO_TECNICO.md).

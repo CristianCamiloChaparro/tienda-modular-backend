@@ -1,6 +1,7 @@
 package com.tienda.modular.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tienda.modular.config.SecurityConfig;
 import com.tienda.modular.dto.CategoriaRequest;
 import com.tienda.modular.dto.CategoriaResponse;
 import com.tienda.modular.exception.GlobalExceptionHandler;
@@ -15,20 +16,24 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CategoriaController.class)
-@Import(GlobalExceptionHandler.class)
+@Import({GlobalExceptionHandler.class, SecurityConfig.class})
 class CategoriaControllerTest {
 
     @Autowired
@@ -98,11 +103,11 @@ class CategoriaControllerTest {
 
         when(categoriaService.crearCategoria(any(CategoriaRequest.class))).thenReturn(response);
 
-        mockMvc.perform(post("/api/v1/categorias")
+        mockMvc.perform(post("/api/v1/categorias").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", org.hamcrest.Matchers.containsString("/api/v1/categorias/3")))
+                .andExpect(header().string("Location", containsString("/api/v1/categorias/3")))
                 .andExpect(jsonPath("$.id", is(3)))
                 .andExpect(jsonPath("$.nombre", is("Calzado")));
 
@@ -114,7 +119,7 @@ class CategoriaControllerTest {
     void crear_conNombreBlanco_retorna400() throws Exception {
         CategoriaRequest request = new CategoriaRequest("   ", "Descripcion");
 
-        mockMvc.perform(post("/api/v1/categorias")
+        mockMvc.perform(post("/api/v1/categorias").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -132,7 +137,7 @@ class CategoriaControllerTest {
         when(categoriaService.crearCategoria(any(CategoriaRequest.class)))
                 .thenThrow(new ReglaNegocioException("Ya existe una categoria con el nombre 'Ropa'"));
 
-        mockMvc.perform(post("/api/v1/categorias")
+        mockMvc.perform(post("/api/v1/categorias").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict())
@@ -150,7 +155,7 @@ class CategoriaControllerTest {
 
         when(categoriaService.actualizarCategoria(eq(1L), any(CategoriaRequest.class))).thenReturn(response);
 
-        mockMvc.perform(put("/api/v1/categorias/1")
+        mockMvc.perform(put("/api/v1/categorias/1").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -166,7 +171,7 @@ class CategoriaControllerTest {
     void actualizar_conNombreBlanco_retorna400() throws Exception {
         CategoriaRequest request = new CategoriaRequest("", "Descripcion");
 
-        mockMvc.perform(put("/api/v1/categorias/1")
+        mockMvc.perform(put("/api/v1/categorias/1").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -182,7 +187,7 @@ class CategoriaControllerTest {
         String nombreLargo = "A".repeat(81);
         CategoriaRequest request = new CategoriaRequest(nombreLargo, "Descripcion");
 
-        mockMvc.perform(put("/api/v1/categorias/1")
+        mockMvc.perform(put("/api/v1/categorias/1").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -200,7 +205,7 @@ class CategoriaControllerTest {
         when(categoriaService.actualizarCategoria(eq(99L), any(CategoriaRequest.class)))
                 .thenThrow(new RecursoNoEncontradoException("Categoria con id 99 no encontrada"));
 
-        mockMvc.perform(put("/api/v1/categorias/99")
+        mockMvc.perform(put("/api/v1/categorias/99").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
@@ -218,7 +223,7 @@ class CategoriaControllerTest {
         when(categoriaService.actualizarCategoria(eq(1L), any(CategoriaRequest.class)))
                 .thenThrow(new ReglaNegocioException("Ya existe una categoria con el nombre 'Accesorios'"));
 
-        mockMvc.perform(put("/api/v1/categorias/1")
+        mockMvc.perform(put("/api/v1/categorias/1").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict())
@@ -233,7 +238,7 @@ class CategoriaControllerTest {
     void eliminar_sinProductos_retorna204() throws Exception {
         doNothing().when(categoriaService).eliminarCategoria(1L);
 
-        mockMvc.perform(delete("/api/v1/categorias/1"))
+        mockMvc.perform(delete("/api/v1/categorias/1").with(comoAdmin()))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));
 
@@ -246,7 +251,7 @@ class CategoriaControllerTest {
         doThrow(new RecursoNoEncontradoException("Categoria con id 99 no encontrada"))
                 .when(categoriaService).eliminarCategoria(99L);
 
-        mockMvc.perform(delete("/api/v1/categorias/99"))
+        mockMvc.perform(delete("/api/v1/categorias/99").with(comoAdmin()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status", is(404)))
                 .andExpect(jsonPath("$.mensaje", is("Categoria con id 99 no encontrada")));
@@ -260,11 +265,62 @@ class CategoriaControllerTest {
         doThrow(new ReglaNegocioException("No se puede eliminar la categoría porque tiene productos asociados"))
                 .when(categoriaService).eliminarCategoria(1L);
 
-        mockMvc.perform(delete("/api/v1/categorias/1"))
+        mockMvc.perform(delete("/api/v1/categorias/1").with(comoAdmin()))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status", is(409)))
                 .andExpect(jsonPath("$.mensaje", is("No se puede eliminar la categoría porque tiene productos asociados")));
 
         verify(categoriaService).eliminarCategoria(1L);
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/categorias sin sesion -> 401 Unauthorized en formato ApiError")
+    void crear_sinSesion_retorna401() throws Exception {
+        mockMvc.perform(post("/api/v1/categorias").with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new CategoriaRequest("Libros", null))))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status", is(401)));
+
+        verifyNoInteractions(categoriaService);
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/categorias como CLIENTE -> 403 Forbidden")
+    void crear_comoCliente_retorna403() throws Exception {
+        mockMvc.perform(post("/api/v1/categorias").with(csrf()).with(user("cliente").roles("CLIENTE"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new CategoriaRequest("Libros", null))))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.mensaje", is("No tienes permisos para realizar esta operacion")));
+
+        verifyNoInteractions(categoriaService);
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/categorias/{id} como ADMIN pero sin token CSRF -> 403 Forbidden")
+    void eliminar_sinTokenCsrf_retorna403() throws Exception {
+        mockMvc.perform(delete("/api/v1/categorias/1").with(user("admin").roles("ADMIN")))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.mensaje", is("Token CSRF ausente o invalido: la peticion fue bloqueada")));
+
+        verifyNoInteractions(categoriaService);
+    }
+
+    @Test
+    @DisplayName("Las respuestas incluyen cabeceras contra XSS y clickjacking")
+    void respuestas_incluyenCabecerasDeSeguridad() throws Exception {
+        when(categoriaService.listarCategorias()).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/categorias"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Security-Policy", containsString("script-src 'self'")))
+                .andExpect(header().string("X-Content-Type-Options", "nosniff"))
+                .andExpect(header().string("X-Frame-Options", "DENY"));
+    }
+
+    /** Las operaciones de escritura requieren rol ADMIN y token CSRF. */
+    private static RequestPostProcessor comoAdmin() {
+        return request -> csrf().postProcessRequest(user("admin").roles("ADMIN").postProcessRequest(request));
     }
 }

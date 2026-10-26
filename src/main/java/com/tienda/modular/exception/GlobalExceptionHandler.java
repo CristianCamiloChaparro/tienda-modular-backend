@@ -5,6 +5,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,6 +28,27 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ReglaNegocioException.class)
     public ResponseEntity<ApiError> reglaNegocio(ReglaNegocioException ex, HttpServletRequest req) {
         return construir(HttpStatus.CONFLICT, ex.getMessage(), req, null);
+    }
+
+    @ExceptionHandler(DatoInvalidoException.class)
+    public ResponseEntity<ApiError> datoInvalido(DatoInvalidoException ex, HttpServletRequest req) {
+        return construir(HttpStatus.BAD_REQUEST, ex.getMessage(), req, Map.of(ex.getCampo(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(PagoRechazadoException.class)
+    public ResponseEntity<ApiError> pagoRechazado(PagoRechazadoException ex, HttpServletRequest req) {
+        return construir(HttpStatus.PAYMENT_REQUIRED, ex.getMessage(), req, null);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiError> credenciales(AuthenticationException ex, HttpServletRequest req) {
+        // Mismo mensaje si el correo no existe o si la clave es incorrecta: no revela que cuentas existen.
+        return construir(HttpStatus.UNAUTHORIZED, "Correo o contrasena incorrectos", req, null);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiError> argumentoInvalido(IllegalArgumentException ex, HttpServletRequest req) {
+        return construir(HttpStatus.BAD_REQUEST, ex.getMessage(), req, null);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

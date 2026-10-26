@@ -61,3 +61,7 @@ node e2e-tests/run-all.js --tier=4
 | `BACKEND_DIR` | `..` | Directorio raíz del proyecto backend |
 | `ORACLE_PORT` | `8089` | Puerto HTTP para el servidor oráculo en modo `--oracle` |
 | `REQUEST_TIMEOUT_MS`| `8000` | Timeout por solicitud HTTP (ms) |
+| `E2E_ADMIN_EMAIL` | `admin@tienda.com` | Administrador con el que se ejecutan las operaciones de escritura |
+| `E2E_ADMIN_PASSWORD` | valor de desarrollo | Contraseña de ese administrador |
+
+> Desde la incorporación de Spring Security, el cliente HTTP se comporta como un navegador: inicia sesión como administrador, guarda las cookies y envía la cabecera `X-XSRF-TOKEN` en cada operación de escritura.

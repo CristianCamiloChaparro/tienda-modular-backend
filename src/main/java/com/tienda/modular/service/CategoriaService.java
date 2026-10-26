@@ -2,11 +2,13 @@ package com.tienda.modular.service;
 
 import com.tienda.modular.dto.CategoriaRequest;
 import com.tienda.modular.dto.CategoriaResponse;
+import com.tienda.modular.exception.DatoInvalidoException;
 import com.tienda.modular.exception.RecursoNoEncontradoException;
 import com.tienda.modular.exception.ReglaNegocioException;
 import com.tienda.modular.model.Categoria;
 import com.tienda.modular.repository.CategoriaRepository;
 import com.tienda.modular.repository.ProductoRepository;
+import com.tienda.modular.util.TextoSeguro;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,23 +40,23 @@ public class CategoriaService {
 
     @Transactional
     public CategoriaResponse crearCategoria(CategoriaRequest datos) {
-        String nombre = datos.nombre().trim();
+        String nombre = nombreLimpio(datos.nombre());
         if (categoriaRepository.existsByNombreIgnoreCase(nombre)) {
             throw new ReglaNegocioException("Ya existe una categoria con el nombre '" + nombre + "'");
         }
-        Categoria categoria = new Categoria(nombre, limpiar(datos.descripcion()));
+        Categoria categoria = new Categoria(nombre, TextoSeguro.limpiar(datos.descripcion()));
         return CategoriaResponse.desde(categoriaRepository.save(categoria));
     }
 
     @Transactional
     public CategoriaResponse actualizarCategoria(Long id, CategoriaRequest datos) {
         Categoria categoria = buscarEntidad(id);
-        String nombre = datos.nombre().trim();
+        String nombre = nombreLimpio(datos.nombre());
         if (categoriaRepository.existsByNombreIgnoreCaseAndIdNot(nombre, id)) {
             throw new ReglaNegocioException("Ya existe una categoria con el nombre '" + nombre + "'");
         }
         categoria.setNombre(nombre);
-        categoria.setDescripcion(limpiar(datos.descripcion()));
+        categoria.setDescripcion(TextoSeguro.limpiar(datos.descripcion()));
         return CategoriaResponse.desde(categoriaRepository.save(categoria));
     }
 
@@ -74,7 +76,12 @@ public class CategoriaService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Categoria con id " + id + " no encontrada"));
     }
 
-    private String limpiar(String texto) {
-        return (texto == null || texto.isBlank()) ? null : texto.trim();
+    /** Quita HTML del nombre (mitigacion XSS); si no queda texto, es un dato invalido. */
+    private String nombreLimpio(String nombre) {
+        String limpio = TextoSeguro.limpiar(nombre);
+        if (limpio == null) {
+            throw new DatoInvalidoException("nombre", "El nombre no puede quedar vacio ni contener solo HTML");
+        }
+        return limpio;
     }
 }

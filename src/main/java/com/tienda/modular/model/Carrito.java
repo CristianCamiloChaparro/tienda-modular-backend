@@ -10,7 +10,7 @@ import java.util.UUID;
 
 /**
  * Carrito de compras identificado por un UUID (sesion anonima del visitante).
- * Tabla: carritos. Sus endpoints se implementan en la semana 13.
+ * Tabla: carritos
  */
 @Entity
 @Table(name = "carritos")
@@ -52,17 +52,36 @@ public class Carrito {
         items.add(new ItemCarrito(this, producto, cantidad, producto.getPrecio()));
     }
 
-    public void modificarCantidad(Long productoId, int cantidad) {
+    /** @return false si el producto no esta en el carrito. */
+    public boolean modificarCantidad(Long productoId, int cantidad) {
         for (ItemCarrito item : items) {
             if (item.getProducto().getId().equals(productoId)) {
                 item.actualizarCantidad(cantidad);
-                return;
+                return true;
             }
         }
+        return false;
     }
 
-    public void eliminarProducto(Long productoId) {
-        items.removeIf(item -> item.getProducto().getId().equals(productoId));
+    /** @return false si el producto no esta en el carrito. */
+    public boolean eliminarProducto(Long productoId) {
+        return items.removeIf(item -> item.getProducto().getId().equals(productoId));
+    }
+
+    public int cantidadDe(Long productoId) {
+        return items.stream()
+                .filter(item -> item.getProducto().getId().equals(productoId))
+                .mapToInt(ItemCarrito::getCantidad)
+                .sum();
+    }
+
+    /** Toma el precio vigente de cada producto, por si el administrador lo cambio. */
+    public void sincronizarPrecios() {
+        items.forEach(ItemCarrito::sincronizarPrecio);
+    }
+
+    public int contarUnidades() {
+        return items.stream().mapToInt(ItemCarrito::getCantidad).sum();
     }
 
     public void vaciarCarrito() {

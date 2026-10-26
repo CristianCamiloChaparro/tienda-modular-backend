@@ -5,7 +5,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/** Permite que el frontend (otro origen, ej. Vite en :5173) consuma la API. */
+/**
+ * Permite que el frontend en otro origen consuma la API enviando la cookie de sesion.
+ * En desarrollo y produccion el frontend pasa por un proxy (mismo origen), asi que esto
+ * solo aplica si se llama a la API directamente desde otro dominio permitido.
+ */
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
@@ -16,7 +20,8 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
                 .allowedOrigins(origenesPermitidos)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*");
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                .allowedHeaders("Content-Type", "Accept", "X-XSRF-TOKEN")
+                .allowCredentials(true);
     }
 }

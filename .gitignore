@@ -20,3 +20,6 @@ Thumbs.db
 .env
 .agents/
 ORIGINAL_REQUEST.md
+
+### Certificados locales ###
+certs/

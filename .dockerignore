@@ -1,0 +1,9 @@
+target
+.git
+.idea
+.vscode
+.agents
+certs
+e2e-tests
+*.log
+.env

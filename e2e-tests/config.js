@@ -21,6 +21,10 @@ export const CONFIG = {
   BACKEND_DIR: process.env.BACKEND_DIR || path.resolve(__dirname, '..'),
   FRONTEND_DIR: process.env.FRONTEND_DIR || path.resolve(__dirname, '../../tienda-modular-frontend'),
   
+  // Administrador con el que se prueban las operaciones de escritura (rol ADMIN)
+  ADMIN_EMAIL: process.env.E2E_ADMIN_EMAIL || 'admin@tienda.com',
+  ADMIN_PASSWORD: process.env.E2E_ADMIN_PASSWORD || 'Admin12345',
+
   // Timeouts (milliseconds)
   REQUEST_TIMEOUT_MS: parseInt(process.env.REQUEST_TIMEOUT_MS || '8000', 10),
   HEALTH_CHECK_TIMEOUT_MS: parseInt(process.env.HEALTH_CHECK_TIMEOUT_MS || '3000', 10),

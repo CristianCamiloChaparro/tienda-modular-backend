@@ -78,7 +78,15 @@ async function main() {
     } else {
       http = new HttpClient(apiUrl);
       const isAlive = await http.checkHealth();
-      if (!isAlive) {
+      if (isAlive) {
+        const sesion = await http.iniciarSesionAdmin();
+        if (sesion.ok) {
+          reporter.info(`Sesion de administrador iniciada (${CONFIG.ADMIN_EMAIL})`);
+        } else {
+          console.log(`\n\x1b[33m[ADVERTENCIA] No se pudo iniciar sesion como administrador (HTTP ${sesion.status}).`);
+          console.log(`Defina E2E_ADMIN_EMAIL y E2E_ADMIN_PASSWORD; sin sesion las operaciones de escritura responden 401.\x1b[0m\n`);
+        }
+      } else {
         console.log(`\n\x1b[33m[ADVERTENCIA] El backend en ${apiUrl} no responde o esta fuera de linea.\x1b[0m`);
         console.log(`Para ejecutar las pruebas HTTP contra el backend real:`);
         console.log(`  1. Inicie PostgreSQL en el puerto 5432`);

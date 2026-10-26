@@ -1,0 +1,59 @@
+# ==========================================================
+#  Tienda en Linea Modular - entorno completo con un comando
+#
+#  docker compose up --build
+#  -> https://localhost        (frontend + API detras de HTTPS)
+#  -> https://localhost/api/v1/docs  (Swagger)
+#
+#  Requiere el frontend clonado al lado de este proyecto:
+#    ../tienda-modular-frontend   (o definir FRONTEND_DIR)
+# ==========================================================
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: tienda_modular
+      POSTGRES_USER: tienda
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-tienda_local}
+    volumes:
+      - datos:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tienda -d tienda_modular"]
+      interval: 5s
+      retries: 10
+
+  backend:
+    build: .
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/tienda_modular
+      DB_USER: tienda
+      DB_PASSWORD: ${DB_PASSWORD:-tienda_local}
+      COOKIE_SECURE: "true"
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@tienda.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin12345}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ${FRONTEND_DIR:-../tienda-modular-frontend}
+    environment:
+      BACKEND_URL: http://backend:8080
+    depends_on:
+      - backend
+
+  # Termina TLS con un certificado local emitido por Caddy y redirige http -> https
+  https:
+    image: caddy:2-alpine
+    command: caddy reverse-proxy --from localhost --to frontend:80
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+    depends_on:
+      - frontend
+
+volumes:
+  datos:
+  caddy_data:
