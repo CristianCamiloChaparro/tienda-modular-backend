@@ -57,7 +57,9 @@ Detener: `docker compose down` (agregar `-v` para borrar también la base de dat
 
 ## C. Render (URL pública para la sustentación)
 
-**Despliegue actual:** backend en https://tienda-backend-8nul.onrender.com (Swagger en `/api/v1/docs`) y frontend en el servicio `tienda-frontend`.
+**Despliegue actual (Render):**
+- Tienda (frontend): **https://tienda-frontend-v18v.onrender.com**
+- API (backend): https://tienda-backend-8nul.onrender.com/api/v1 — Swagger en https://tienda-frontend-v18v.onrender.com/api/v1/docs
 
 Opción manual (como está desplegado):
 1. **New → Postgres** (plan Free): nombre `tienda-db`, base `tienda_modular`, usuario `tienda`.
