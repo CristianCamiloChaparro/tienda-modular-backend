@@ -1,7 +1,14 @@
 # Documento técnico — Tienda en Línea Modular
 
 **Equipo:** Gustavo Andrés Núñez Vega y Cristian Camilo Chaparro
-**Repositorio:** `tienda-modular-backend` — backend (API REST) en la raíz y frontend (SPA) en `frontend/`
+
+| Recurso | Enlace |
+|---|---|
+| **Aplicación publicada** | https://tienda-frontend-v18v.onrender.com |
+| **Documentación de la API (Swagger)** | https://tienda-frontend-v18v.onrender.com/api/v1/docs |
+| **Repositorio** | https://github.com/CristianCamiloChaparro/tienda-modular-backend — backend (API REST) en la raíz y frontend (SPA) en `frontend/` |
+
+> La aplicación está en el plan gratuito de Render: si lleva un rato sin visitas, la primera carga tarda alrededor de un minuto mientras el servidor enciende.
 
 ---
 
@@ -22,7 +29,9 @@ Un pequeño negocio vende sus productos publicando fotos sueltas en redes social
 6. Aplicar seguridad demostrable: HTTPS, mitigación de XSS y protección CSRF.
 7. Usar SCSS y un gestor de dependencias/automatizador (npm + Vite, Maven) y desplegar la aplicación de forma accesible.
 
-## 3. Alcance
+## 3. Alcance (versión final)
+
+La sección 3.1 explica qué cambió frente a la planeación de la semana 10.
 
 | Incluye | No incluye |
 |---|---|
@@ -31,6 +40,26 @@ Un pequeño negocio vende sus productos publicando fotos sueltas en redes social
 | Pasarela de pagos en modo prueba (sandbox) | Cobros con dinero real |
 | Roles ADMIN y CLIENTE | Recuperación de contraseña por correo |
 | Despliegue con Docker y en Render | Aplicación móvil nativa |
+
+### 3.1 Cambios respecto a la planeación inicial
+
+**Funcionalidades agregadas.** En la planeación de la semana 10 la pasarela de pagos quedó fuera del alcance, y el sistema solo contemplaba categorías, productos, catálogo, carrito y panel de administrador. En el seguimiento del proyecto (6 de octubre) quedaron como pendientes el carrito, el panel de administrador, el inicio de sesión y la pasarela de pagos, por lo que el alcance se amplió con:
+
+| Cambio | Requerimientos | Motivo |
+|---|---|---|
+| Usuarios con inicio de sesión y roles (ADMIN, CLIENTE) | RF-10, RF-11, RF-12 | El panel de administrador solo es seguro si únicamente un administrador autenticado puede modificar el catálogo; la protección CSRF exigida también parte de una sesión |
+| Pasarela de pagos en modo prueba | RF-13 | Convierte el carrito en una compra real: valida la tarjeta, cobra el total y descuenta el inventario |
+| Pedidos e historial | RF-14, RF-15 | Un pago aprobado debe quedar registrado para el cliente y para el administrador |
+
+La pasarela se implementó en **modo prueba** (no mueve dinero real) y detrás de la interfaz `PasarelaPago`, para poder cambiarla por un proveedor real sin tocar el resto del sistema.
+
+**Un repositorio en lugar de dos.** En la semana 10 se planeó un repositorio para el backend y otro para el frontend. En la versión final ambos proyectos viven en el mismo repositorio: el backend en la raíz y el frontend en la carpeta `frontend/`. La separación exigida (criterio 2) se mantiene porque es de arquitectura, no de carpetas:
+
+- Cada proyecto tiene su propio gestor de dependencias y build (Maven y `pom.xml` / npm y `package.json`), sus propias pruebas y su propio `Dockerfile`.
+- Se despliegan como **dos servicios independientes** en Render, cada uno con su URL; se pueden actualizar por separado.
+- El frontend no importa código del backend: solo se comunican por HTTP con la API REST (`/api/v1`), y el backend no tiene vistas.
+
+Se eligió un solo repositorio porque, para un equipo de dos personas, simplifica revisar en un mismo cambio la API y la pantalla que la usa, mantener la documentación y las pruebas end-to-end junto al código que prueban, y desplegar desde un único lugar.
 
 ## 4. Requerimientos funcionales
 
@@ -238,8 +267,8 @@ Se trabajó con un esquema **incremental por iteraciones semanales** inspirado e
 | Unitarias backend | Limpieza XSS (`TextoSeguroTest`), pasarela y algoritmo de Luhn (`PasarelaPagoSimuladaTest`) | `./mvnw test` |
 | Controladores (MockMvc) | Respuestas 200/201/204/400/404/409, 401 sin sesión, 403 sin rol o sin token CSRF, cabeceras CSP | `./mvnw test` |
 | Integración (Spring Boot + H2) | Flujo completo con sesión y CSRF reales: registro → carrito → pago rechazado (stock intacto) → pago aprobado (stock descontado) → historial; administración del catálogo y limpieza de HTML | `./mvnw test` |
-| Frontend (Vitest) | Componentes del catálogo, estados visuales, cliente HTTP con token CSRF y reintento | `npm test` |
-| End-to-end (Node) | Caja negra contra la API desplegada | `node e2e-tests/run-all.js` |
+| Frontend (Vitest) | Componentes del catálogo, estados visuales, cliente HTTP con token CSRF, reintento mientras el servidor enciende y orden de las operaciones del carrito | `npm test` (en `frontend/`) |
+| End-to-end (Node) | Caja negra contra la API en marcha, en cuatro niveles: funcionalidad, límites, integración y escenarios reales | `node e2e-tests/run-all.js` |
 
 ## 12. Cumplimiento de los criterios de aceptación
 
@@ -252,5 +281,27 @@ Se trabajó con un esquema **incremental por iteraciones semanales** inspirado e
 | 5 | Carrito operativo | El total lo calcula la API en cada agregar/modificar/quitar (prueba de integración `flujoCompletoDeCompra`) |
 | 6 | Catálogo navegable por categoría | Filtro por categoría con `GET /productos?categoriaId=` |
 | 7 | API documentada | Swagger con descripción, ejemplos, códigos de respuesta y guía para probarla (incluye CSRF automático) |
-| 8 | Seguridad aplicada | Ver [`SEGURIDAD.md`](SEGURIDAD.md): un caso demostrable por medida |
-| 9 | Aplicación accesible | Ver [`DESPLIEGUE.md`](DESPLIEGUE.md): Render (URL pública con HTTPS) o Docker Compose |
+| 8 | Seguridad aplicada | **HTTPS:** al abrir `http://` el navegador termina en `https://`; las respuestas traen `Strict-Transport-Security` y las cookies salen con `Secure`. **XSS:** un producto creado con `<script>alert(1)</script>Cuaderno` se guarda como `Cuaderno`; la cabecera `Content-Security-Policy` bloquea scripts inyectados. **CSRF:** un POST sin la cabecera `X-XSRF-TOKEN` responde 403 "Token CSRF ausente o invalido" (figura 6). Detalle y guion de la demostración en `SEGURIDAD.md` |
+| 9 | Aplicación accesible | Publicada en https://tienda-frontend-v18v.onrender.com (frontend) con el backend y PostgreSQL también en Render, sobre HTTPS. Alternativa local con un comando: `docker compose up --build`. Detalle en `DESPLIEGUE.md` |
+
+## 13. Evidencias
+
+Capturas de la aplicación en funcionamiento.
+
+**Figura 1. Catálogo con filtro por categoría**  
+![Catálogo](img/01-catalogo.jpg)
+
+**Figura 2. Carrito: el total se recalcula en cada cambio**  
+![Carrito](img/02-carrito.jpg)
+
+**Figura 3. Panel de administrador: listado de productos**  
+![Panel de administrador](img/03-admin-productos.jpg)
+
+**Figura 4. Panel de administrador: formulario para crear un producto, con vista previa de la imagen**  
+![Formulario de producto](img/04-admin-formulario.jpg)
+
+**Figura 5. Documentación de la API en Swagger UI**  
+![Swagger](img/05-swagger.jpg)
+
+**Figura 6. Protección CSRF: un POST sin token es rechazado con 403**  
+![Respuesta 403 por CSRF](img/06-csrf-403.jpg)
