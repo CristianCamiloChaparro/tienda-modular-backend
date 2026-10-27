@@ -2,7 +2,9 @@ package com.tienda.modular.integracion;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tienda.modular.model.Producto;
 import com.tienda.modular.model.Rol;
+import com.tienda.modular.repository.ProductoRepository;
 import com.tienda.modular.repository.UsuarioRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.Year;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,9 +36,42 @@ class SeguridadIntegrationTest {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private ProductoRepository productoRepository;
+
     /** IP propia por prueba: el limite de intentos de login se cuenta por IP y no debe cruzarse. */
     private Navegador navegador(String ip) {
         return new Navegador(mockMvc, objectMapper, ip);
+    }
+
+    private Navegador cliente(String ip, String email) throws Exception {
+        Navegador cliente = navegador(ip);
+        cliente.enviar(post("/api/v1/auth/registro"),
+                Map.of("nombre", "Cliente", "email", email, "password", "ClaveSegura2026"), 201);
+        return cliente;
+    }
+
+    private Navegador admin(String ip) throws Exception {
+        Navegador admin = navegador(ip);
+        admin.enviar(post("/api/v1/auth/login"),
+                Map.of("email", "admin@tienda.com", "password", "ClaveSoloPruebas1"), 200);
+        return admin;
+    }
+
+    private Producto productoConStock() {
+        return productoRepository.findAllByOrderByNombreAsc().stream()
+                .filter(p -> p.isActivo() && p.getStock() >= 5).findFirst().orElseThrow();
+    }
+
+    /** Compra un producto con la tarjeta de prueba aprobada y devuelve el id del pedido. */
+    private long comprar(Navegador cliente) throws Exception {
+        String carritoId = cliente.json(post("/api/v1/carritos"), null, 201).get("id").asText();
+        cliente.enviar(post("/api/v1/carritos/" + carritoId + "/items"),
+                Map.of("productoId", productoConStock().getId(), "cantidad", 1), 200);
+        Map<String, Object> pago = Map.of("titular", "CLIENTE", "numeroTarjeta", "4242 4242 4242 4242",
+                "mesExpiracion", 12, "anioExpiracion", Year.now().getValue() + 2, "cvv", "123");
+        return cliente.json(post("/api/v1/pedidos"), Map.of("carritoId", carritoId,
+                "direccionEnvio", "Calle 1", "telefono", "3001234567", "pago", pago), 201).get("id").asLong();
     }
 
     // ---------- Parte 2: registro, hash y limite de intentos ----------
@@ -110,5 +146,46 @@ class SeguridadIntegrationTest {
     @DisplayName("Parte 2: una ruta privada sin sesion responde 401")
     void rutaPrivada_sinSesion_401() throws Exception {
         navegador("10.0.2.7").enviar(get("/api/v1/pedidos/mios"), null, 401);
+    }
+
+    // ---------- Parte 3: roles y control de acceso ----------
+
+    @Test
+    @DisplayName("Parte 3: un cliente que intenta DELETE /productos/{id} recibe 403; el administrador 204")
+    void eliminarProducto_soloAdmin() throws Exception {
+        Navegador admin = admin("10.0.3.1");
+        long categoriaId = admin.json(post("/api/v1/categorias"), Map.of("nombre", "Parte 3"), 201)
+                .get("id").asLong();
+        long productoId = admin.json(post("/api/v1/productos"), Map.of("categoriaId", categoriaId,
+                "nombre", "Producto de prueba", "precio", 1000, "stock", 1), 201).get("id").asLong();
+
+        cliente("10.0.3.2", "parte3@correo.com").enviar(delete("/api/v1/productos/" + productoId), null, 403);
+        navegador("10.0.3.3").enviar(delete("/api/v1/productos/" + productoId), null, 401);
+        admin.enviar(delete("/api/v1/productos/" + productoId), null, 204);
+    }
+
+    @Test
+    @DisplayName("Parte 3 / IDOR: B pidiendo el pedido de A recibe 404; A y el administrador lo ven")
+    void pedidoAjeno_404() throws Exception {
+        Navegador a = cliente("10.0.3.4", "cliente.a@correo.com");
+        Navegador b = cliente("10.0.3.5", "cliente.b@correo.com");
+        long pedidoDeA = comprar(a);
+
+        b.enviar(get("/api/v1/pedidos/" + pedidoDeA), null, 404);
+        b.enviar(get("/api/v1/pedidos/999999"), null, 404); // mismo resultado que un id inexistente
+        assertEquals(0, b.json(get("/api/v1/pedidos/mios"), null, 200).size());
+
+        assertEquals(pedidoDeA, a.json(get("/api/v1/pedidos/" + pedidoDeA), null, 200).get("id").asLong());
+        assertEquals(pedidoDeA, admin("10.0.3.6").json(get("/api/v1/pedidos/" + pedidoDeA), null, 200)
+                .get("id").asLong());
+    }
+
+    @Test
+    @DisplayName("Parte 3: solo el administrador cambia el estado de un pedido")
+    void cambiarEstado_soloAdmin() throws Exception {
+        Navegador cliente = cliente("10.0.3.7", "estado@correo.com");
+        long pedido = comprar(cliente);
+        cliente.enviar(patch("/api/v1/pedidos/" + pedido + "/estado"), Map.of("estado", "ENTREGADO"), 403);
+        admin("10.0.3.8").enviar(patch("/api/v1/pedidos/" + pedido + "/estado"), Map.of("estado", "ENVIADO"), 200);
     }
 }

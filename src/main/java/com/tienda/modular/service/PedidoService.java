@@ -105,13 +105,16 @@ public class PedidoService {
                 .map(PedidoResponse::desde).toList();
     }
 
-    /** Un cliente solo puede ver sus propios pedidos; el administrador ve todos. */
+    /**
+     * Un cliente solo puede ver sus propios pedidos (la consulta siempre incluye al propietario);
+     * el administrador ve todos. El pedido de otro cliente responde 404: ni siquiera se revela que existe.
+     */
     @Transactional(readOnly = true)
     public PedidoResponse obtener(Long id, UsuarioAutenticado usuario) {
-        Pedido pedido = buscarEntidad(id);
-        if (!usuario.esAdmin() && !pedido.getUsuario().getId().equals(usuario.id())) {
-            throw new RecursoNoEncontradoException("Pedido con id " + id + " no encontrado");
-        }
+        Pedido pedido = usuario.esAdmin()
+                ? buscarEntidad(id)
+                : pedidoRepository.findWithItemsByIdAndUsuarioId(id, usuario.id())
+                        .orElseThrow(() -> new RecursoNoEncontradoException("Pedido con id " + id + " no encontrado"));
         return PedidoResponse.desde(pedido);
     }
 

@@ -1,0 +1,28 @@
+## Usuarios de prueba: administrador (creado por AdminSeeder con ADMIN_PASSWORD del .env), cliente A y cliente B
+{"id":2,"nombre":"Laura","email":"laura.lab@correo.com","rol":"CLIENTE"}
+{"id":3,"nombre":"Bruno","email":"bruno.lab@correo.com","rol":"CLIENTE"}
+Cliente A crea el pedido id=1
+
+## 3.2 IDOR: el cliente B pide GET /api/v1/pedidos/1 (pedido de A)
+{"timestamp":"2026-10-27T22:26:04.991101088","status":404,"error":"Not Found","mensaje":"Pedido con id 1 no encontrado","ruta":"/api/v1/pedidos/1","campos":null}
+-> HTTP 404
+
+## El cliente A pide su propio pedido
+{"id":1,"estado":"PAGADO","total":52000.00,"direccionEnvio":"Calle 10 # 20-30","telefono":"3001234567","referenciaPago":"...","medioPago":"VISA **** 4242","clie
+-> HTTP 200
+
+## 3.1 Un cliente intenta DELETE /api/v1/productos/<id> y ver todos los pedidos
+$ (cliente B) DELETE /api/v1/productos/7
+{"timestamp":"2026-10-27T22:26:05.184017887","status":403,"error":"Forbidden","mensaje":"No tienes permisos para realizar esta operacion","ruta":"/api/v1/productos/7","campos":null}
+-> HTTP 403
+$ (cliente B) GET /api/v1/pedidos
+{"timestamp":"2026-10-27T22:26:05.214573186","status":403,"error":"Forbidden","mensaje":"No tienes permisos para realizar esta operacion","ruta":"/api/v1/pedidos","campos":null}
+-> HTTP 403
+$ (administrador) DELETE /api/v1/productos/7
+
+-> HTTP 204
+
+## Riesgo aceptado: los carritos son anonimos y se identifican por un UUID aleatorio
+$ (cliente B, conociendo el UUID del carrito de A) GET /api/v1/carritos/9232d062-a9a1-4e5f-a5b6-a55cb1ebc7dc
+{"id":"9232d062-a9a1-4e5f-a5b6-a55cb1ebc7dc","items":[],"totalUnidades":0,"total":0,"fechaActualizacion":"2026-10-27T22:26:05.346826"}
+-> HTTP 200

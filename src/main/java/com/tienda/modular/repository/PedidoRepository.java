@@ -17,4 +17,8 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     @EntityGraph(attributePaths = {"usuario", "items"})
     Optional<Pedido> findWithItemsById(Long id);
+
+    /** Busca el pedido solo entre los del propietario: el pedido de otro cliente "no existe". */
+    @EntityGraph(attributePaths = {"usuario", "items"})
+    Optional<Pedido> findWithItemsByIdAndUsuarioId(Long id, Long usuarioId);
 }
