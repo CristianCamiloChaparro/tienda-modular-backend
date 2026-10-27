@@ -1,0 +1,21 @@
+$ curl -sI http://localhost:8080/api/v1/productos
+HTTP/1.1 302 
+Location: https://localhost:8443/api/v1/productos
+
+$ curl -skI https://localhost:8443/api/v1/productos
+HTTP/1.1 200 
+X-Content-Type-Options: nosniff
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Strict-Transport-Security: max-age=300 ; includeSubDomains
+X-Frame-Options: DENY
+Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
+Referrer-Policy: strict-origin-when-cross-origin
+
+$ openssl s_client -connect localhost:8443 -servername localhost </dev/null | openssl x509 -noout -subject -issuer -dates
+subject=C = CO, O = Proyecto de Aula, OU = Tienda Modular, CN = localhost
+issuer=C = CO, O = Proyecto de Aula, OU = Tienda Modular, CN = localhost
+notBefore=Oct 27 22:18:12 2026 GMT
+notAfter=Oct 27 22:18:12 2027 GMT
+
+$ openssl s_client -connect localhost:8443 </dev/null | grep "Cipher is"
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384

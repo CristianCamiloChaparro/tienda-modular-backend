@@ -39,6 +39,8 @@ services:
     build: ./frontend
     environment:
       BACKEND_URL: http://backend:8080
+      # HSTS en localhost afecta a todos los puertos: vigencia corta (5 minutos)
+      HSTS_MAX_AGE: "300"
     depends_on:
       - backend
 

@@ -18,8 +18,9 @@ Cada medida exigida (HTTPS, XSS, CSRF) tiene un **caso concreto** que se puede m
 2. DevTools → Network → cualquier respuesta de `/api/v1/...` → ver `Strict-Transport-Security`.
 3. DevTools → Application → Cookies → `JSESSIONID` con `Secure` y `HttpOnly` marcados.
 
-Local con el perfil `https`:
+Local con el perfil `https` (la clave del certificado va en `SSL_PASSWORD` dentro de `.env`; con [mkcert](https://github.com/FiloSottile/mkcert) instalado el script emite un certificado de confianza local, si no, uno autofirmado):
 ```bash
+cp .env.example .env                     # y completar los valores
 ./scripts/generar-certificado.sh
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=https
 curl -I http://localhost:8080/api/v1/productos      # 302 -> https://localhost:8443/...

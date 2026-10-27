@@ -16,8 +16,15 @@ out/
 .DS_Store
 Thumbs.db
 
-### Variables locales ###
+### Variables locales (secretos) ###
 .env
+.env.*
+!.env.example
 
-### Certificados locales ###
+### Certificados y claves privadas: nunca se suben ###
 certs/
+*.p12
+*.pfx
+*.jks
+*.pem
+*.key

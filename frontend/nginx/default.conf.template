@@ -19,6 +19,9 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-Frame-Options "DENY" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    # HSTS: el navegador no vuelve a intentar http://. Solo lo respeta si la pagina llego por HTTPS
+    # (Render, Caddy). Con Docker Compose en localhost se usa una vigencia corta (HSTS_MAX_AGE).
+    add_header Strict-Transport-Security "max-age=${HSTS_MAX_AGE}; includeSubDomains" always;
 
     # ---------- API: mismo origen que el frontend ----------
     # El navegador solo habla con este dominio; nginx reenvia /api al backend.

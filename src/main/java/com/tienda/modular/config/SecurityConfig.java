@@ -41,6 +41,9 @@ public class SecurityConfig {
     @Value("${server.port:8080}")
     private int puertoHttps;
 
+    @Value("${app.security.hsts-max-age:31536000}")
+    private long hstsMaxAge;
+
     @Bean
     public CsrfTokenRepository csrfTokenRepository() {
         // Legible por JavaScript del mismo origen (la SPA) pero no por otros sitios.
@@ -72,7 +75,7 @@ public class SecurityConfig {
                                 ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                         .httpStrictTransportSecurity(hsts -> hsts
                                 .includeSubDomains(true)
-                                .maxAgeInSeconds(31_536_000)))
+                                .maxAgeInSeconds(hstsMaxAge)))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/error").permitAll()
                         .requestMatchers("/api/v1/docs", "/api/v1/docs/**", "/api/v1/api-docs/**",
