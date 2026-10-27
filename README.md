@@ -52,7 +52,7 @@ src/main/java/com/tienda/modular
 1. Tener PostgreSQL corriendo y crear la base `tienda_modular`.
 2. Ejecutar (o abrir en IntelliJ y correr `TiendaModularApplication` con la variable `DB_PASSWORD`):
    ```bash
-   DB_PASSWORD=tu_contraseña ./mvnw spring-boot:run
+   DB_PASSWORD=tu_contraseña ADMIN_PASSWORD=clave_del_admin ./mvnw spring-boot:run
    ```
 3. Abrir **http://localhost:8080/api/v1/docs** (Swagger UI).
 
@@ -64,7 +64,7 @@ Para todo junto (base de datos, backend, frontend y HTTPS) con Docker: `docker c
 
 | Rol | Cómo obtenerla |
 |---|---|
-| Administrador | Variables `ADMIN_EMAIL` / `ADMIN_PASSWORD` (en desarrollo, los valores por defecto de `application.properties`) |
+| Administrador | Se crea al primer arranque con `ADMIN_EMAIL` y `ADMIN_PASSWORD`. La contraseña no tiene valor por defecto ni se versiona: si no se define, no se crea ningún administrador |
 | Cliente | Crear una cuenta desde la página *Crear cuenta* o con `POST /api/v1/auth/registro` |
 
 **Tarjetas de prueba de la pasarela:** `4242 4242 4242 4242` aprobada · `4000 0000 0000 0002` rechazada (fondos insuficientes). Cualquier CVV y una fecha futura.

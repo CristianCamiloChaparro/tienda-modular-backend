@@ -10,7 +10,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-/** Crea el primer administrador si todavia no existe ninguno (credenciales por variables de entorno). */
+/**
+ * Crea el primer administrador si todavia no existe ninguno. La contrasena llega por la variable
+ * ADMIN_PASSWORD; si no esta definida no se crea ninguno (nunca hay una clave por defecto).
+ */
 @Component
 public class AdminSeeder implements CommandLineRunner {
 
@@ -36,6 +39,10 @@ public class AdminSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (usuarioRepository.existsByRol(Rol.ADMIN)) {
+            return;
+        }
+        if (password == null || password.isBlank()) {
+            log.warn("AdminSeeder: ADMIN_PASSWORD no esta definida, no se creo el administrador inicial");
             return;
         }
         usuarioRepository.save(new Usuario(nombre, email.trim().toLowerCase(),

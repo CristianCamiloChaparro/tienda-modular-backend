@@ -145,7 +145,7 @@ class FlujoCompraIntegrationTest {
 
         Navegador admin = new Navegador();
         JsonNode usuario = admin.json(post("/api/v1/auth/login"),
-                Map.of("email", "admin@tienda.com", "password", "Admin12345"), 200);
+                Map.of("email", "admin@tienda.com", "password", "ClaveSoloPruebas1"), 200);
         assertEquals("ADMIN", usuario.get("rol").asText());
 
         JsonNode categoria = admin.json(post("/api/v1/categorias"),

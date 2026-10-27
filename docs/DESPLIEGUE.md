@@ -24,7 +24,7 @@ tienda-modular-backend/
 ```bash
 # Terminal 1 - backend (http://localhost:8080)
 cd tienda-modular-backend
-DB_PASSWORD=tu_clave ./mvnw spring-boot:run
+DB_PASSWORD=tu_clave ADMIN_PASSWORD=una_clave ./mvnw spring-boot:run
 
 # Terminal 2 - frontend (http://localhost:5173)
 cd tienda-modular-backend/frontend
@@ -49,7 +49,7 @@ docker compose up --build
 
 Contenedores: `db` (PostgreSQL 17) → `backend` (Spring Boot) → `frontend` (nginx con la SPA y proxy `/api`) → `https` (Caddy, TLS).
 
-Variables opcionales (archivo `.env` junto al `docker-compose.yml`): `DB_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
+Antes de arrancar, crear un archivo `.env` junto al `docker-compose.yml` con `ADMIN_PASSWORD=<una contraseña>` (obligatoria). Opcionales: `DB_PASSWORD`, `ADMIN_EMAIL`.
 
 Detener: `docker compose down` (agregar `-v` para borrar también la base de datos).
 
@@ -86,7 +86,8 @@ En ambos casos se abre la URL del frontend; Swagger también queda disponible en
 | `DB_HOST` / `DB_PORT` / `DB_NAME` | `localhost` / `5432` / `tienda_modular` | Alternativa a `DB_URL` |
 | `DB_USER` / `DB_PASSWORD` | `postgres` / `postgres` | Credenciales de la BD |
 | `PORT` | `8080` | Puerto HTTP |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | `admin@tienda.com` / `Admin12345` | Administrador inicial (solo si no existe ninguno) |
+| `ADMIN_EMAIL` | `admin@tienda.com` | Correo del administrador inicial |
+| `ADMIN_PASSWORD` | *(sin valor)* | Contraseña del administrador inicial. Si no se define, no se crea ninguno |
 | `COOKIE_SECURE` | `false` | `true` en producción (cookies solo por HTTPS) |
 | `REQUIRE_HTTPS` | `false` | `true` para redirigir toda petición HTTP a HTTPS |
 | `CORS_ORIGINS` | `http://localhost:5173` | Solo si el frontend llama a la API desde otro dominio |

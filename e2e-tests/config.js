@@ -1,6 +1,6 @@
 /**
  * E2E Test Suite Configuration
- * Tienda en Línea Modular — Semana 12
+ * Tienda en Línea Modular
  */
 
 import path from 'node:path';
@@ -23,16 +23,14 @@ export const CONFIG = {
   
   // Administrador con el que se prueban las operaciones de escritura (rol ADMIN)
   ADMIN_EMAIL: process.env.E2E_ADMIN_EMAIL || 'admin@tienda.com',
-  ADMIN_PASSWORD: process.env.E2E_ADMIN_PASSWORD || 'Admin12345',
+  // Sin valor por defecto: la contrasena del administrador no se versiona.
+  ADMIN_PASSWORD: process.env.E2E_ADMIN_PASSWORD || '',
 
   // Timeouts (milliseconds)
   REQUEST_TIMEOUT_MS: parseInt(process.env.REQUEST_TIMEOUT_MS || '8000', 10),
   HEALTH_CHECK_TIMEOUT_MS: parseInt(process.env.HEALTH_CHECK_TIMEOUT_MS || '3000', 10),
   BUILD_TIMEOUT_MS: parseInt(process.env.BUILD_TIMEOUT_MS || '60000', 10),
 
-  // Test Oracle Port for standalone mode
-  ORACLE_PORT: parseInt(process.env.ORACLE_PORT || '8089', 10),
-  ORACLE_BASE_URL: `http://localhost:${process.env.ORACLE_PORT || '8089'}/api/v1`,
 };
 
 export default CONFIG;

@@ -29,7 +29,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-tienda_local}
       COOKIE_SECURE: "true"
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@tienda.com}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin12345}
+      # Obligatoria: definirla en un archivo .env junto a este docker-compose.yml
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Define ADMIN_PASSWORD en el archivo .env}
     depends_on:
       db:
         condition: service_healthy
