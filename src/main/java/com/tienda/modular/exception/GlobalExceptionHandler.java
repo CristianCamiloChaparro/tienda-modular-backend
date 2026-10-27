@@ -1,13 +1,17 @@
 package com.tienda.modular.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,9 +21,14 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Convierte las excepciones en respuestas JSON uniformes (nunca HTML). */
+/**
+ * Convierte las excepciones en respuestas JSON uniformes (nunca HTML). Hacia afuera solo salen
+ * mensajes pensados para el usuario; trazas, nombres de clases y SQL quedan en el log del servidor.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(RecursoNoEncontradoException.class)
     public ResponseEntity<ApiError> noEncontrado(RecursoNoEncontradoException ex, HttpServletRequest req) {
@@ -55,9 +64,16 @@ public class GlobalExceptionHandler {
         return construir(HttpStatus.UNAUTHORIZED, "Correo o contrasena incorrectos", req, null);
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> accesoDenegado(AccessDeniedException ex, HttpServletRequest req) {
+        return construir(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta operacion", req, null);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiError> argumentoInvalido(IllegalArgumentException ex, HttpServletRequest req) {
-        return construir(HttpStatus.BAD_REQUEST, ex.getMessage(), req, null);
+        // El mensaje puede venir de una libreria y revelar detalles internos: solo va al log.
+        log.warn("Argumento invalido en {} {}: {}", req.getMethod(), req.getRequestURI(), ex.getMessage());
+        return construir(HttpStatus.BAD_REQUEST, "La solicitud contiene datos invalidos", req, null);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -84,6 +100,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> integridad(DataIntegrityViolationException ex, HttpServletRequest req) {
         return construir(HttpStatus.CONFLICT,
                 "La operacion viola una restriccion de integridad de la base de datos", req, null);
+    }
+
+    /**
+     * Ultima red: errores propios de Spring MVC (ruta inexistente, metodo no permitido...) conservan su
+     * codigo; cualquier otro error falla de forma segura con un 500 generico y el detalle en el log.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> noControlada(Exception ex, HttpServletRequest req) {
+        if (ex instanceof ErrorResponse errorSpring) {
+            HttpStatus status = HttpStatus.valueOf(errorSpring.getStatusCode().value());
+            return construir(status, status.getReasonPhrase(), req, null);
+        }
+        log.error("Error no controlado en {} {}", req.getMethod(), req.getRequestURI(), ex);
+        return construir(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Ocurrio un error interno. Intente de nuevo mas tarde", req, null);
     }
 
     private ResponseEntity<ApiError> construir(HttpStatus status, String mensaje,

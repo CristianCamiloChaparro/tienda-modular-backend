@@ -50,11 +50,12 @@ src/main/java/com/tienda/modular
 ## Cómo ejecutarlo
 
 1. Tener PostgreSQL corriendo y crear la base `tienda_modular`.
-2. Ejecutar (o abrir en IntelliJ y correr `TiendaModularApplication` con la variable `DB_PASSWORD`):
+2. Copiar `.env.example` como `.env` y completar `DB_PASSWORD` y `ADMIN_PASSWORD` (el `.env` está en `.gitignore`).
+3. Ejecutar (o abrir en IntelliJ y correr `TiendaModularApplication`):
    ```bash
-   DB_PASSWORD=tu_contraseña ADMIN_PASSWORD=clave_del_admin ./mvnw spring-boot:run
+   ./mvnw spring-boot:run
    ```
-3. Abrir **http://localhost:8080/api/v1/docs** (Swagger UI).
+4. Abrir **http://localhost:8080/api/v1/docs** (Swagger UI).
 
 En el primer arranque Hibernate crea las tablas y se cargan 3 categorías, 6 productos y el administrador inicial.
 

@@ -24,7 +24,8 @@ tienda-modular-backend/
 ```bash
 # Terminal 1 - backend (http://localhost:8080)
 cd tienda-modular-backend
-DB_PASSWORD=tu_clave ADMIN_PASSWORD=una_clave ./mvnw spring-boot:run
+cp .env.example .env          # completar DB_PASSWORD y ADMIN_PASSWORD (el .env no se sube a git)
+./mvnw spring-boot:run
 
 # Terminal 2 - frontend (http://localhost:5173)
 cd tienda-modular-backend/frontend
@@ -32,6 +33,10 @@ npm install
 npm run dev
 ```
 Vite reenvía `/api` al backend, así que se abre solo `http://localhost:5173`.
+
+Los secretos se leen del archivo `.env` (Spring Boot lo importa con `spring.config.import`); también pueden pasarse como variables de entorno. Si falta `DB_PASSWORD` el backend no arranca y lo indica en el log.
+
+Con HTTPS local (perfil `https`, ver [SEGURIDAD.md](SEGURIDAD.md)): `./scripts/generar-certificado.sh` y `./mvnw spring-boot:run -Dspring-boot.run.profiles=https` → `https://localhost:8443`.
 
 ---
 
@@ -49,7 +54,7 @@ docker compose up --build
 
 Contenedores: `db` (PostgreSQL 17) → `backend` (Spring Boot) → `frontend` (nginx con la SPA y proxy `/api`) → `https` (Caddy, TLS).
 
-Antes de arrancar, crear un archivo `.env` junto al `docker-compose.yml` con `ADMIN_PASSWORD=<una contraseña>` (obligatoria). Opcionales: `DB_PASSWORD`, `ADMIN_EMAIL`.
+Antes de arrancar, copiar `.env.example` como `.env` y definir `DB_PASSWORD` y `ADMIN_PASSWORD` (obligatorias). Opcional: `ADMIN_EMAIL`.
 
 Detener: `docker compose down` (agregar `-v` para borrar también la base de datos).
 
@@ -84,12 +89,15 @@ En ambos casos se abre la URL del frontend; Swagger también queda disponible en
 |---|---|---|
 | `DB_URL` | `jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}` | URL JDBC completa |
 | `DB_HOST` / `DB_PORT` / `DB_NAME` | `localhost` / `5432` / `tienda_modular` | Alternativa a `DB_URL` |
-| `DB_USER` / `DB_PASSWORD` | `postgres` / `postgres` | Credenciales de la BD |
+| `DB_USER` | `postgres` | Usuario de la BD |
+| `DB_PASSWORD` | *(obligatoria)* | Contraseña de la BD. Sin ella el backend no arranca |
 | `PORT` | `8080` | Puerto HTTP |
 | `ADMIN_EMAIL` | `admin@tienda.com` | Correo del administrador inicial |
 | `ADMIN_PASSWORD` | *(sin valor)* | Contraseña del administrador inicial. Si no se define, no se crea ninguno |
 | `COOKIE_SECURE` | `false` | `true` en producción (cookies solo por HTTPS) |
 | `REQUIRE_HTTPS` | `false` | `true` para redirigir toda petición HTTP a HTTPS |
+| `SSL_PASSWORD` | *(obligatoria con el perfil `https`)* | Contraseña del certificado local `certs/tienda-local.p12` |
+| `HSTS_MAX_AGE` | `31536000` (perfil `https`: `300`) | Vigencia de HSTS en segundos |
 | `CORS_ORIGINS` | `http://localhost:5173` | Solo si el frontend llama a la API desde otro dominio |
 | `SHOW_SQL` | `false` | Mostrar el SQL de Hibernate en consola |
 

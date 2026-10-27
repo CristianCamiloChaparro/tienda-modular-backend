@@ -13,7 +13,7 @@ services:
     environment:
       POSTGRES_DB: tienda_modular
       POSTGRES_USER: tienda
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-tienda_local}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el archivo .env}
     volumes:
       - datos:/var/lib/postgresql/data
     healthcheck:
@@ -26,7 +26,7 @@ services:
     environment:
       DB_URL: jdbc:postgresql://db:5432/tienda_modular
       DB_USER: tienda
-      DB_PASSWORD: ${DB_PASSWORD:-tienda_local}
+      DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el archivo .env}
       COOKIE_SECURE: "true"
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@tienda.com}
       # Obligatoria: definirla en un archivo .env junto a este docker-compose.yml

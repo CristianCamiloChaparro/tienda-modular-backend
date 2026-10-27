@@ -92,6 +92,9 @@ Página atacante de ejemplo ([`docs/laboratorio/ataque-csrf.html`](laboratorio/a
 | Fuerza bruta | Máximo 5 intentos fallidos por IP cada 15 minutos; el sexto responde **429** con `Retry-After` (`LimitadorLogin`) |
 | Registro de eventos | Cada intento fallido y cada bloqueo se escribe en el log (`WARN`) con la IP |
 | Sesión | Cookie `JSESSIONID` `HttpOnly`, `Secure` y `SameSite=Strict`; vence tras 15 minutos sin actividad |
+| Secretos | Solo en `.env` (ignorado por git) o variables de entorno; `.env.example` documenta cuáles hacen falta. Sin `DB_PASSWORD` el servidor no arranca (`VerificadorDeSecretos`) |
+| Errores | Hacia afuera solo mensajes genéricos (`GlobalExceptionHandler`, `server.error.include-*=never`); el detalle queda en el log |
+| Dependencias | Dependabot semanal (Maven, npm y Docker) y auditoría con `npm audit` / OWASP dependency-check |
 | Fijación de sesión | Nuevo id de sesión al autenticarse (`changeSessionId`) |
 | Autorización | Reglas por rol en el servidor (`SecurityConfig`); el frontend solo oculta botones, la API es la que bloquea (401/403) |
 | Pedidos ajenos | Un cliente que pide el pedido de otro recibe 404 (no se confirma que exista) |
