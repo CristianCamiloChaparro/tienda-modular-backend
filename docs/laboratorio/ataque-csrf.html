@@ -1,0 +1,17 @@
+<!doctype html>
+<!--
+  Parte 5.3 — Pagina maliciosa de prueba (CSRF).
+  Abrirla desde OTRO origen (doble clic en el archivo, o servida en otro puerto) mientras el
+  administrador tiene la sesion abierta en https://localhost:8443. Intenta crear una categoria.
+  Resultado esperado: NO se crea nada. El servidor responde 403 (falta el token CSRF) y, ademas,
+  el navegador no envia las cookies SameSite=Strict en una peticion iniciada por otro sitio.
+-->
+<html lang="es">
+<head><meta charset="utf-8"><title>Ganaste un premio</title></head>
+<body>
+  <form action="https://localhost:8443/api/v1/categorias" method="POST">
+    <input type="hidden" name="nombre" value="categoria-del-atacante">
+  </form>
+  <script>document.forms[0].submit()</script>
+</body>
+</html>

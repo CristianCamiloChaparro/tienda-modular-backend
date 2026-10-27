@@ -1,0 +1,24 @@
+## 5.3 Navegador real (Chromium): sesion de administrador abierta y pagina maliciosa en otro sitio
+$ ADMIN_PASSWORD=... node docs/laboratorio/demo-csrf.mjs
+## Sesion del administrador abierta: POST /auth/login -> 200
+   cookie JSESSIONID: HttpOnly=true Secure=true SameSite=Strict
+   cookie XSRF-TOKEN: HttpOnly=false Secure=true SameSite=Strict
+
+## Peticion legitima desde el mismo origen (X-XSRF-TOKEN enviada): POST /categorias -> 201
+
+## Pagina maliciosa en https://atacante.local/premio.html (formulario POST a la API)
+   Cookies que el navegador adjunto: (ninguna)
+   Respuesta del servidor: 403 Invalid CORS request
+
+## Se creo "categoria-del-atacante"? NO
+
+## Barrera del token aislada: cookie de sesion valida del administrador, pero SIN la cabecera X-XSRF-TOKEN
+$ curl -b <JSESSIONID y XSRF-TOKEN del admin> -X POST /api/v1/categorias -d {"nombre":"sin-token"}   (sin cabecera)
+{"timestamp":"2026-10-27T22:29:45.155033363","status":403,"error":"Forbidden","mensaje":"Token CSRF ausente o invalido: la peticion fue bloqueada","ruta":"/api/v1/categorias","campos":null}
+-> HTTP 403
+$ ... con la cabecera X-XSRF-TOKEN equivocada
+{"timestamp":"2026-10-27T22:29:45.187785757","status":403,"error":"Forbidden","mensaje":"Token CSRF ausente o invalido: la peticion fue bloqueada","ruta":"/api/v1/categorias","campos":null}
+-> HTTP 403
+$ ... con la cabecera X-XSRF-TOKEN copiada de la cookie (lo que hace el frontend en src/services/http.ts)
+{"id":8,"nombre":"con-token","descripcion":null,"creadoEn":"2026-10-27T22:29:45.224828872"}
+-> HTTP 201

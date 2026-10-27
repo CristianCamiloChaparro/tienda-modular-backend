@@ -32,6 +32,10 @@ final class Navegador {
         this.ip = ip;
     }
 
+    MockHttpSession sesion() {
+        return sesion;
+    }
+
     MvcResult enviar(MockHttpServletRequestBuilder peticion, Object cuerpo, int estadoEsperado) throws Exception {
         if (xsrf == null) {
             xsrf = mockMvc.perform(get("/api/v1/auth/csrf").session(sesion)).andReturn()

@@ -6,6 +6,7 @@ import com.tienda.modular.model.Producto;
 import com.tienda.modular.model.Rol;
 import com.tienda.modular.repository.ProductoRepository;
 import com.tienda.modular.repository.UsuarioRepository;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /** Pruebas del laboratorio de seguridad (ver INFORME_SEGURIDAD.md) sobre la aplicacion completa. */
 @SpringBootTest
@@ -212,5 +215,26 @@ class SeguridadIntegrationTest {
         assertEquals("nosniff", respuesta.getResponse().getHeader("X-Content-Type-Options"));
         assertEquals("DENY", respuesta.getResponse().getHeader("X-Frame-Options"));
         assertEquals("strict-origin-when-cross-origin", respuesta.getResponse().getHeader("Referrer-Policy"));
+    }
+
+    // ---------- Parte 5: CSRF ----------
+
+    @Test
+    @DisplayName("Parte 5: la cookie XSRF-TOKEN es legible por JavaScript pero SameSite=Strict")
+    void cookieXsrf_sameSiteStrict() throws Exception {
+        Cookie xsrf = mockMvc.perform(get("/api/v1/auth/csrf")).andReturn().getResponse().getCookie("XSRF-TOKEN");
+        assertNotNull(xsrf);
+        assertEquals("Strict", xsrf.getAttribute("SameSite"));
+        assertFalse(xsrf.isHttpOnly(), "La SPA debe poder leerla para copiarla en la cabecera");
+    }
+
+    @Test
+    @DisplayName("Parte 5: con la sesion del administrador pero sin la cabecera X-XSRF-TOKEN se responde 403")
+    void sesionValidaSinCabeceraCsrf_403() throws Exception {
+        Navegador admin = admin("10.0.5.1");
+        mockMvc.perform(post("/api/v1/categorias").session(admin.sesion())
+                        .contentType("application/json").content("{\"nombre\":\"sin-token\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.mensaje").value("Token CSRF ausente o invalido: la peticion fue bloqueada"));
     }
 }

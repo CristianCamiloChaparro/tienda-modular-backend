@@ -47,8 +47,9 @@ public class SecurityConfig {
     @Bean
     public CsrfTokenRepository csrfTokenRepository() {
         // Legible por JavaScript del mismo origen (la SPA) pero no por otros sitios.
+        // SameSite=Strict: igual que la cookie de sesion, nunca viaja en peticiones iniciadas por otro sitio.
         CookieCsrfTokenRepository repositorio = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        repositorio.setCookieCustomizer(cookie -> cookie.sameSite("Lax"));
+        repositorio.setCookieCustomizer(cookie -> cookie.sameSite("Strict"));
         return repositorio;
     }
 

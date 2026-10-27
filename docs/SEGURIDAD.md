@@ -59,7 +59,7 @@ Se aplica **defensa en profundidad**, en tres capas:
 - El backend entrega la cookie `XSRF-TOKEN` (legible solo por JavaScript del mismo origen).
 - En **todo** `POST/PUT/PATCH/DELETE` el frontend copia ese valor en la cabecera `X-XSRF-TOKEN` (`src/services/http.ts`).
 - Spring Security compara cabecera y cookie; si falta o no coincide responde **403** sin ejecutar nada.
-- Un sitio de otro dominio no puede leer la cookie ni poner la cabecera, así que no puede falsificar la petición. `SameSite=Lax` en las cookies es una segunda barrera.
+- Un sitio de otro dominio no puede leer la cookie ni poner la cabecera, así que no puede falsificar la petición. `SameSite=Strict` en ambas cookies es una segunda barrera (el navegador no las adjunta en peticiones iniciadas por otro sitio) y CORS rechaza los orígenes no permitidos.
 - El token se renueva al iniciar y cerrar sesión. Swagger UI también envía la cabecera automáticamente.
 
 **Demostración**
@@ -71,7 +71,7 @@ curl -i -X POST https://<dominio>/api/v1/auth/login \
 ```
 En el navegador: DevTools → Network → cualquier `POST` de la aplicación → *Request Headers* → `X-XSRF-TOKEN`.
 
-Página atacante de ejemplo (guardarla como `ataque.html`, abrirla desde otro origen mientras el admin tiene sesión): la categoría **no** se crea y el servidor responde 403, porque la página no puede conocer el token.
+Página atacante de ejemplo ([`docs/laboratorio/ataque-csrf.html`](laboratorio/ataque-csrf.html); `node docs/laboratorio/demo-csrf.mjs` la prueba en Chromium, abrirla desde otro origen mientras el admin tiene sesión): la categoría **no** se crea y el servidor responde 403, porque la página no puede conocer el token.
 ```html
 <form action="https://<dominio>/api/v1/categorias" method="POST">
   <input type="hidden" name="nombre" value="Categoria falsa">
