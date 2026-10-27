@@ -1,5 +1,5 @@
 /**
- * Tier 2: Boundary and Corner Cases — Frontend SCSS Architecture (F10)
+ * Nivel 2: Boundary and Corner Cases — Frontend SCSS Architecture (F10)
  * 
  * Verifies strict compliance with modular SCSS requirements:
  * - Presence of design system tokens (_variables.scss)
@@ -14,8 +14,8 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import { CONFIG } from '../config.js';
 
-export async function runTier2Frontend(reporter) {
-  reporter.tier(2, 'Boundary & Architecture — SCSS Modular System (F10)');
+export async function runNivel2Frontend(reporter) {
+  reporter.nivel(2, 'Boundary & Architecture — SCSS Modular System (F10)');
 
   const frontendDir = CONFIG.FRONTEND_DIR;
   const stylesDir = path.join(frontendDir, 'src', 'styles');
@@ -117,4 +117,4 @@ export async function runTier2Frontend(reporter) {
   }
 }
 
-export default runTier2Frontend;
+export default runNivel2Frontend;

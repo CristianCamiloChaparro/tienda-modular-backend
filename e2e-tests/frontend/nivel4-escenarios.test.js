@@ -1,5 +1,5 @@
 /**
- * Tier 4: Real-World Application Scenarios — UI Visual States & Error Recovery (F9)
+ * Nivel 4: Real-World Application Scenarios — UI Visual States & Error Recovery (F9)
  * 
  * Verifies real-world frontend resilience and user experience:
  * - LoadingState: Skeleton elements with shimmer animation
@@ -13,8 +13,8 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import { CONFIG } from '../config.js';
 
-export async function runTier4Frontend(reporter) {
-  reporter.tier(4, 'Real-World Scenarios — Visual States & Fault Recovery (F9)');
+export async function runNivel4Frontend(reporter) {
+  reporter.nivel(4, 'Real-World Scenarios — Visual States & Fault Recovery (F9)');
 
   const frontendDir = CONFIG.FRONTEND_DIR;
   const componentsDir = path.join(frontendDir, 'src', 'components');
@@ -106,4 +106,4 @@ export async function runTier4Frontend(reporter) {
   }
 }
 
-export default runTier4Frontend;
+export default runNivel4Frontend;

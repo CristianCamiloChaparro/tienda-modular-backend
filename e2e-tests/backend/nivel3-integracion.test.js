@@ -1,5 +1,5 @@
 /**
- * Tier 3: Cross-Feature Combinations — Backend Endpoints
+ * Nivel 3: Cross-Feature Combinations — Backend Endpoints
  * 
  * Verifies complex multi-feature workflows across Categories and Products:
  * - Dynamic referential integrity lifecycle:
@@ -18,8 +18,8 @@
 import { Assertions } from '../utils/assertions.js';
 import assert from 'node:assert/strict';
 
-export async function runTier3Backend(http, reporter) {
-  reporter.tier(3, 'Cross-Feature Combinations — Relational Lifecycle & Cascade Rules');
+export async function runNivel3Backend(http, reporter) {
+  reporter.nivel(3, 'Cross-Feature Combinations — Relational Lifecycle & Cascade Rules');
 
   const timestamp = Date.now();
 
@@ -27,14 +27,14 @@ export async function runTier3Backend(http, reporter) {
   try {
     // 1. Create C1 and C2
     const resC1 = await http.post('/categorias', {
-      nombre: `Tier3 Origen ${timestamp}`,
+      nombre: `Nivel3 Origen ${timestamp}`,
       descripcion: 'Categoria de origen para transferencia',
     });
     Assertions.assertStatus(resC1, 201);
     const catId1 = resC1.body.id;
 
     const resC2 = await http.post('/categorias', {
-      nombre: `Tier3 Destino ${timestamp}`,
+      nombre: `Nivel3 Destino ${timestamp}`,
       descripcion: 'Categoria de destino para transferencia',
     });
     Assertions.assertStatus(resC2, 201);
@@ -43,7 +43,7 @@ export async function runTier3Backend(http, reporter) {
     // 2. Create P1 in C1
     const resP1 = await http.post('/productos', {
       categoriaId: catId1,
-      nombre: `Tier3 Item Transferible ${timestamp}`,
+      nombre: `Nivel3 Item Transferible ${timestamp}`,
       descripcion: 'Producto que cambiara de categoria',
       precio: 85000.0,
       stock: 15,
@@ -62,7 +62,7 @@ export async function runTier3Backend(http, reporter) {
     // 4. Update P1 to belong to C2
     const transferRes = await http.put(`/productos/${prodId}`, {
       categoriaId: catId2,
-      nombre: `Tier3 Item Transferible ${timestamp}`,
+      nombre: `Nivel3 Item Transferible ${timestamp}`,
       descripcion: 'Producto reasignado a C2',
       precio: 85000.0,
       stock: 15,
@@ -98,7 +98,7 @@ export async function runTier3Backend(http, reporter) {
   // Test 3.2: Multi-product referential barrier (Category protected until last product is removed)
   try {
     const resC = await http.post('/categorias', {
-      nombre: `Tier3 MultiProd ${timestamp}`,
+      nombre: `Nivel3 MultiProd ${timestamp}`,
       descripcion: 'Categoria con multiples productos',
     });
     Assertions.assertStatus(resC, 201);
@@ -149,4 +149,4 @@ export async function runTier3Backend(http, reporter) {
   }
 }
 
-export default runTier3Backend;
+export default runNivel3Backend;

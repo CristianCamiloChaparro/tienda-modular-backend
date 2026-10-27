@@ -51,7 +51,7 @@ export class HttpClient {
         });
         this.guardarCookies(r);
       } catch {
-        // Servidor sin endpoint CSRF (p. ej. el oraculo): se continua sin token.
+        // Servidor sin endpoint CSRF: se continua sin token.
       }
     }
 

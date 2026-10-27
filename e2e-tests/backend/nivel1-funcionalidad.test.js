@@ -1,5 +1,5 @@
 /**
- * Tier 1: Feature Coverage (Happy Path) — Backend Endpoints (F1 - F5)
+ * Nivel 1: Feature Coverage (Happy Path) — Backend Endpoints (F1 - F5)
  * 
  * Verifies core functionality for:
  * - F1: PUT /api/v1/categorias/{id} (200 OK)
@@ -12,44 +12,44 @@
 import { Assertions } from '../utils/assertions.js';
 import assert from 'node:assert/strict';
 
-export async function runTier1Backend(http, reporter) {
-  reporter.tier(1, 'Feature Coverage (Happy Path) — Backend Endpoints F1 - F5');
+export async function runNivel1Backend(http, reporter) {
+  reporter.nivel(1, 'Feature Coverage (Happy Path) — Backend Endpoints F1 - F5');
 
-  // Setup: Create a dedicated isolated category for Tier 1 tests
+  // Setup: Create a dedicated isolated category for Nivel 1 tests
   const uniqueSuffix = Date.now();
-  const catName = `Tier1 Cat ${uniqueSuffix}`;
+  const catName = `Nivel1 Cat ${uniqueSuffix}`;
   let catId = null;
 
   try {
     const createCatRes = await http.post('/categorias', {
       nombre: catName,
-      descripcion: 'Categoria para prueba Tier 1',
+      descripcion: 'Categoria para prueba Nivel 1',
     });
     Assertions.assertStatus(createCatRes, 201, 'Setup: Creacion de categoria aislada');
     catId = createCatRes.body.id;
     reporter.info(`Created test category id=${catId} ("${catName}")`);
   } catch (err) {
-    reporter.fail('Setup: Creacion de categoria para Tier 1', err);
+    reporter.fail('Setup: Creacion de categoria para Nivel 1', err);
     return;
   }
 
   // Setup: Create a dedicated isolated product under this category
   let prodId = null;
-  const prodName = `Tier1 Prod ${uniqueSuffix}`;
+  const prodName = `Nivel1 Prod ${uniqueSuffix}`;
   try {
     const createProdRes = await http.post('/productos', {
       categoriaId: catId,
       nombre: prodName,
-      descripcion: 'Producto para prueba Tier 1',
+      descripcion: 'Producto para prueba Nivel 1',
       precio: 49900.0,
       stock: 25,
-      imagenUrl: 'https://picsum.photos/seed/tier1/400/400',
+      imagenUrl: 'https://picsum.photos/seed/nivel1/400/400',
     });
     Assertions.assertStatus(createProdRes, 201, 'Setup: Creacion de producto aislado');
     prodId = createProdRes.body.id;
     reporter.info(`Created test product id=${prodId} ("${prodName}")`);
   } catch (err) {
-    reporter.fail('Setup: Creacion de producto para Tier 1', err);
+    reporter.fail('Setup: Creacion de producto para Nivel 1', err);
     return;
   }
 
@@ -87,7 +87,7 @@ export async function runTier1Backend(http, reporter) {
       descripcion: 'Descripcion de producto modificada',
       precio: 59900.0,
       stock: 50,
-      imagenUrl: 'https://picsum.photos/seed/tier1-mod/400/400',
+      imagenUrl: 'https://picsum.photos/seed/nivel1-mod/400/400',
     });
 
     Assertions.assertStatus(putProdRes, 200, 'F3: PUT producto debe responder 200 OK');
@@ -170,4 +170,4 @@ export async function runTier1Backend(http, reporter) {
   }
 }
 
-export default runTier1Backend;
+export default runNivel1Backend;

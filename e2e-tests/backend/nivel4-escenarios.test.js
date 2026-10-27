@@ -1,5 +1,5 @@
 /**
- * Tier 4: Real-World Application Scenarios — Backend Endpoints
+ * Nivel 4: Real-World Application Scenarios — Backend Endpoints
  * 
  * Verifies realistic e-commerce operational scenarios:
  * - Scenario 4.1: Seasonal Price Adjustment Campaign (Cyberlunes / Descuentos)
@@ -10,8 +10,8 @@
 import { Assertions } from '../utils/assertions.js';
 import assert from 'node:assert/strict';
 
-export async function runTier4Backend(http, reporter) {
-  reporter.tier(4, 'Real-World Application Scenarios — E-Commerce Business Workflows');
+export async function runNivel4Backend(http, reporter) {
+  reporter.nivel(4, 'Real-World Application Scenarios — E-Commerce Business Workflows');
 
   const timestamp = Date.now();
   let promoCatId = null;
@@ -20,7 +20,7 @@ export async function runTier4Backend(http, reporter) {
   // Setup: Create a promotional category and product
   try {
     const catRes = await http.post('/categorias', {
-      nombre: `Tier4 Promo ${timestamp}`,
+      nombre: `Nivel4 Promo ${timestamp}`,
       descripcion: 'Categoria de promociones y campanas',
     });
     Assertions.assertStatus(catRes, 201);
@@ -37,7 +37,7 @@ export async function runTier4Backend(http, reporter) {
     Assertions.assertStatus(prodRes, 201);
     promoProdId = prodRes.body.id;
   } catch (err) {
-    reporter.fail('Setup: Creacion de catalogo para Tier 4', err);
+    reporter.fail('Setup: Creacion de catalogo para Nivel 4', err);
     return;
   }
 
@@ -121,4 +121,4 @@ export async function runTier4Backend(http, reporter) {
   }
 }
 
-export default runTier4Backend;
+export default runNivel4Backend;

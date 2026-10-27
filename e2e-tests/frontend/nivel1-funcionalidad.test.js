@@ -1,5 +1,5 @@
 /**
- * Tier 1: Feature Coverage — Frontend Project Scaffolding & Build (F6)
+ * Nivel 1: Feature Coverage — Frontend Project Scaffolding & Build (F6)
  * 
  * Verifies:
  * - Frontend directory exists at configured path
@@ -14,8 +14,8 @@ import { execSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { CONFIG } from '../config.js';
 
-export async function runTier1Frontend(reporter) {
-  reporter.tier(1, 'Feature Coverage — Frontend Scaffolding & Build (F6)');
+export async function runNivel1Frontend(reporter) {
+  reporter.nivel(1, 'Feature Coverage — Frontend Scaffolding & Build (F6)');
 
   const frontendDir = CONFIG.FRONTEND_DIR;
 
@@ -81,4 +81,4 @@ export async function runTier1Frontend(reporter) {
   }
 }
 
-export default runTier1Frontend;
+export default runNivel1Frontend;

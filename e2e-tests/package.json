@@ -1,17 +1,16 @@
 {
   "name": "tienda-modular-e2e-tests",
   "version": "1.0.0",
-  "description": "Opaque-box E2E test suite for Tienda en Línea Modular (Semana 12)",
+  "description": "Opaque-box E2E test suite for Tienda en Línea Modular",
   "type": "module",
   "scripts": {
     "test": "node run-all.js",
-    "test:oracle": "node run-all.js --oracle",
     "test:backend": "node run-all.js --backend",
     "test:frontend": "node run-all.js --frontend",
-    "test:tier1": "node run-all.js --tier=1",
-    "test:tier2": "node run-all.js --tier=2",
-    "test:tier3": "node run-all.js --tier=3",
-    "test:tier4": "node run-all.js --tier=4"
+    "test:nivel1": "node run-all.js --nivel=1",
+    "test:nivel2": "node run-all.js --nivel=2",
+    "test:nivel3": "node run-all.js --nivel=3",
+    "test:nivel4": "node run-all.js --nivel=4"
   },
   "keywords": [
     "e2e",
@@ -20,6 +19,6 @@
     "react",
     "vite"
   ],
-  "author": "teamwork_preview_test_writer_m3_1",
+  "author": "Gustavo Andrés Núñez Vega y Cristian Camilo Chaparro",
   "license": "ISC"
 }

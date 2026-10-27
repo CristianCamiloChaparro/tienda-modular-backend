@@ -1,5 +1,5 @@
 /**
- * Tier 3: Cross-Feature Combinations — Frontend API Service & Contracts (F7 & F8)
+ * Nivel 3: Cross-Feature Combinations — Frontend API Service & Contracts (F7 & F8)
  * 
  * Verifies cross-feature integration between UI components and Backend REST contracts:
  * - TypeScript types match Backend DTO records (Categoria, Producto, ApiError)
@@ -13,8 +13,8 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import { CONFIG } from '../config.js';
 
-export async function runTier3Frontend(reporter) {
-  reporter.tier(3, 'Cross-Feature Integration — API Service & Contract Parity (F7 & F8)');
+export async function runNivel3Frontend(reporter) {
+  reporter.nivel(3, 'Cross-Feature Integration — API Service & Contract Parity (F7 & F8)');
 
   const frontendDir = CONFIG.FRONTEND_DIR;
 
@@ -129,4 +129,4 @@ export async function runTier3Frontend(reporter) {
   }
 }
 
-export default runTier3Frontend;
+export default runNivel3Frontend;

@@ -1,67 +1,42 @@
-# E2E Test Suite — Tienda en Línea Modular (Semana 12)
+# Pruebas end-to-end — Tienda en Línea Modular
 
-Suite de pruebas End-to-End (E2E) de caja opaca para la verificación integral de los entregables de la **Semana 12**:
-- **Backend API REST**: CRUD completo de Categorías (`PUT`, `DELETE`) y Productos (`PUT`, `DELETE`), validaciones, integridad referencial y documentación OpenAPI/Swagger.
-- **Frontend Desacoplado**: Arquitectura SCSS modular, paridad de contratos de servicios API, reactividad de filtros y gestión de estados visuales (Loading, Error, Empty).
+Pruebas de caja negra contra la API real (backend desplegado o local) y revisiones estáticas del proyecto `frontend/`. Están escritas en Node.js nativo (ESM), **sin dependencias**: no requieren `npm install`.
 
----
+## Niveles
 
-## 1. Organización en 4 Niveles Sistemáticos (Tiers)
-
-| Nivel | Enfoque | Backend (F1 - F5) | Frontend (F6 - F10) |
+| Nivel | Enfoque | Backend | Frontend |
 |---|---|---|---|
-| **Tier 1** | **Cobertura de Funcionalidad** (Happy Path) | `PUT /categorias/{id}` (200), `DELETE /categorias/{id}` (204), `PUT /productos/{id}` (200), `DELETE /productos/{id}` (204), OpenAPI docs (200). | Verificación de estructura y compilación limpia `npm run build` con salida en `dist/`. |
-| **Tier 2** | **Límites y Casos de Esquina** (Boundaries & Corners) | Validación nombre (vacío 400, 80 chars 200, 81 chars 400), unicidad 409, integridad referencial 409 con mensaje exacto, precio `<= 0` (400), stock `< 0` (400), 404 para IDs inexistentes y FK inválidas. | Arquitectura SCSS: variables de diseño (`_variables.scss`), mixins responsive (`_mixins.scss`), CSS Modules (`*.module.scss`), prevención de CSS plano. |
-| **Tier 3** | **Combinaciones Cruzadas** (Cross-Feature) | Ciclo de vida relacional: bloqueo referencial dinámico al reasignar producto entre categorías (PUT) y liberación de bloqueo tras eliminación. | Paridad de tipos TypeScript (`Categoria`, `Producto`) con DTOs de backend; filtrado reactivo sin recarga de página (`window.location`). |
-| **Tier 4** | **Escenarios de Aplicación Real** (Real-World) | Actualización masiva de precios en campañas de descuento, liquidación de stock a 0 (estado "Agotado"), integridad de caracteres especiales y acentos en español (UTF-8). | Estados visuales: Skeleton con animación shimmer, ErrorState con acción de reintento, EmptyState con reseteo de filtros, formateo de precios en COP. |
+| 1 | Funcionalidad (camino feliz) | CRUD de categorías y productos (200/201/204) y documentación OpenAPI | Estructura del proyecto y `npm run build` sin errores |
+| 2 | Límites y validaciones | Longitudes, nombres repetidos (409), precio ≤ 0 y stock < 0 (400), ids inexistentes (404), integridad referencial | Arquitectura SCSS: variables, mixins y CSS Modules |
+| 3 | Integración entre funciones | Bloqueo y liberación de categorías al mover y eliminar productos | Tipos de TypeScript alineados con los DTO, cliente HTTP con token CSRF |
+| 4 | Escenarios reales | Descuentos masivos, stock en 0, caracteres especiales del español | Estados visuales de carga, error y vacío; formato de precios en COP |
 
----
+## Ejecución
 
-## 2. Requisitos y Ejecución
+El backend debe estar en marcha. Las operaciones de escritura necesitan rol ADMIN, así que se indican las credenciales del administrador por variables de entorno:
 
-La suite está implementada en **Node.js nativo (ESM)** con **cero dependencias externas**, lo que garantiza ejecución inmediata sin `npm install`.
-
-### Ejecutar todas las pruebas (Backend + Frontend)
 ```bash
-node e2e-tests/run-all.js
+E2E_ADMIN_PASSWORD=<clave del admin> node e2e-tests/run-all.js
 ```
 
-### Ejecutar con Oráculo de Especificación en Memoria (Auto-verificación independiente)
-Permite verificar la suite de pruebas completa de manera offline, validando la lógica de aserción sin requerir el backend Spring Boot activo:
+Opciones:
+
 ```bash
-node e2e-tests/run-all.js --oracle
+node e2e-tests/run-all.js --backend      # solo backend
+node e2e-tests/run-all.js --frontend     # solo frontend (no necesita el backend)
+node e2e-tests/run-all.js --nivel=2      # un solo nivel
 ```
 
-### Ejecutar únicamente pruebas de Backend
-```bash
-node e2e-tests/run-all.js --backend
-```
+El cliente HTTP (`utils/http-client.js`) se comporta como un navegador: inicia sesión, guarda las cookies de sesión y envía la cabecera `X-XSRF-TOKEN` en cada operación de escritura.
 
-### Ejecutar únicamente pruebas de Frontend
-```bash
-node e2e-tests/run-all.js --frontend
-```
+## Variables de entorno
 
-### Ejecutar un Tier específico
-```bash
-node e2e-tests/run-all.js --tier=1
-node e2e-tests/run-all.js --tier=2
-node e2e-tests/run-all.js --tier=3
-node e2e-tests/run-all.js --tier=4
-```
-
----
-
-## 3. Variables de Entorno y Configuración
-
-| Variable | Valor por Defecto | Descripción |
+| Variable | Por defecto | Uso |
 |---|---|---|
-| `API_BASE_URL` | `http://localhost:8080/api/v1` | URL base de la API REST del backend |
-| `FRONTEND_DIR` | `../frontend` | Directorio raíz del proyecto frontend |
-| `BACKEND_DIR` | `..` | Directorio raíz del proyecto backend |
-| `ORACLE_PORT` | `8089` | Puerto HTTP para el servidor oráculo en modo `--oracle` |
-| `REQUEST_TIMEOUT_MS`| `8000` | Timeout por solicitud HTTP (ms) |
-| `E2E_ADMIN_EMAIL` | `admin@tienda.com` | Administrador con el que se ejecutan las operaciones de escritura |
-| `E2E_ADMIN_PASSWORD` | valor de desarrollo | Contraseña de ese administrador |
-
-> Desde la incorporación de Spring Security, el cliente HTTP se comporta como un navegador: inicia sesión como administrador, guarda las cookies y envía la cabecera `X-XSRF-TOKEN` en cada operación de escritura.
+| `API_BASE_URL` | `http://localhost:8080/api/v1` | URL base de la API |
+| `OPENAPI_JSON_URL` | `http://localhost:8080/api/v1/api-docs` | Especificación OpenAPI |
+| `SWAGGER_UI_URL` | `http://localhost:8080/api/v1/docs` | Swagger UI |
+| `FRONTEND_DIR` | `../frontend` | Carpeta del proyecto frontend |
+| `E2E_ADMIN_EMAIL` | `admin@tienda.com` | Administrador para las operaciones de escritura |
+| `E2E_ADMIN_PASSWORD` | *(obligatoria)* | Contraseña de ese administrador (no se versiona) |
+| `REQUEST_TIMEOUT_MS` | `8000` | Tiempo máximo por petición |

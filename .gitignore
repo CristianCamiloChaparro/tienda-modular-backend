@@ -18,8 +18,6 @@ Thumbs.db
 
 ### Variables locales ###
 .env
-.agents/
-ORIGINAL_REQUEST.md
 
 ### Certificados locales ###
 certs/

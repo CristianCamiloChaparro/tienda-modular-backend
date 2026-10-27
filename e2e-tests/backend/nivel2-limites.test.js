@@ -1,5 +1,5 @@
 /**
- * Tier 2: Boundary and Corner Cases — Backend API
+ * Nivel 2: Boundary and Corner Cases — Backend API
  * 
  * Tests boundary conditions, business rules, validation errors, and integrity constraints:
  * - F1: PUT categorias validation (blank, length=80, length=81, 404 not found, 409 duplicate, same name 200)
@@ -11,8 +11,8 @@
 import { Assertions } from '../utils/assertions.js';
 import assert from 'node:assert/strict';
 
-export async function runTier2Backend(http, reporter) {
-  reporter.tier(2, 'Boundary & Corner Cases — Backend Validation & Error Handling');
+export async function runNivel2Backend(http, reporter) {
+  reporter.nivel(2, 'Boundary & Corner Cases — Backend Validation & Error Handling');
 
   const timestamp = Date.now();
   let baseCatIdA = null;
@@ -22,14 +22,14 @@ export async function runTier2Backend(http, reporter) {
   // Setup: Create two categories and one product for collision and FK tests
   try {
     const resA = await http.post('/categorias', {
-      nombre: `Tier2 Alpha ${timestamp}`,
+      nombre: `Nivel2 Alpha ${timestamp}`,
       descripcion: 'Categoria Alpha para pruebas de colision',
     });
     Assertions.assertStatus(resA, 201);
     baseCatIdA = resA.body.id;
 
     const resB = await http.post('/categorias', {
-      nombre: `Tier2 Beta ${timestamp}`,
+      nombre: `Nivel2 Beta ${timestamp}`,
       descripcion: 'Categoria Beta para pruebas de colision',
     });
     Assertions.assertStatus(resB, 201);
@@ -37,7 +37,7 @@ export async function runTier2Backend(http, reporter) {
 
     const resP = await http.post('/productos', {
       categoriaId: baseCatIdA,
-      nombre: `Tier2 Prod Base ${timestamp}`,
+      nombre: `Nivel2 Prod Base ${timestamp}`,
       descripcion: 'Producto para prueba de integridad referencial',
       precio: 15000.0,
       stock: 10,
@@ -45,7 +45,7 @@ export async function runTier2Backend(http, reporter) {
     Assertions.assertStatus(resP, 201);
     testProdId = resP.body.id;
   } catch (err) {
-    reporter.fail('Setup: Creacion de entidades para Tier 2', err);
+    reporter.fail('Setup: Creacion de entidades para Nivel 2', err);
     return;
   }
 
@@ -107,7 +107,7 @@ export async function runTier2Backend(http, reporter) {
   // Test 2.5: Duplicate category name across different IDs -> 409 Conflict
   try {
     const res = await http.put(`/categorias/${baseCatIdB}`, {
-      nombre: `Tier2 Alpha ${timestamp}`, // Name of Cat A
+      nombre: `Nivel2 Alpha ${timestamp}`, // Name of Cat A
       descripcion: 'Intento de duplicar nombre de otra categoria',
     });
     Assertions.assertApiError(res, 409, 'Ya existe una categoria');
@@ -119,11 +119,11 @@ export async function runTier2Backend(http, reporter) {
   // Test 2.6: Updating category with its own current name -> 200 OK (no conflict)
   try {
     const res = await http.put(`/categorias/${baseCatIdA}`, {
-      nombre: `Tier2 Alpha ${timestamp}`, // Same name
+      nombre: `Nivel2 Alpha ${timestamp}`, // Same name
       descripcion: 'Descripcion modificada pero manteniendo el mismo nombre',
     });
     Assertions.assertStatus(res, 200, 'Actualizar sin cambiar nombre no debe causar conflicto');
-    assert.equal(res.body.nombre, `Tier2 Alpha ${timestamp}`);
+    assert.equal(res.body.nombre, `Nivel2 Alpha ${timestamp}`);
     reporter.pass('F1 Corner: PUT categoria conservando su propio nombre responde 200 OK');
   } catch (err) {
     reporter.fail('F1 Corner: PUT categoria conservando su propio nombre', err);
@@ -282,4 +282,4 @@ export async function runTier2Backend(http, reporter) {
   }
 }
 
-export default runTier2Backend;
+export default runNivel2Backend;

@@ -1,12 +1,12 @@
 /**
- * Test Reporter with Rich ANSI Output and Tier Organization
+ * Test Reporter with Rich ANSI Output and Nivel Organization
  */
 
 export class TestReporter {
   constructor(suiteName = 'E2E Test Suite') {
     this.suiteName = suiteName;
     this.results = [];
-    this.currentTier = null;
+    this.currentNivel = null;
     this.startTime = Date.now();
   }
 
@@ -23,18 +23,18 @@ export class TestReporter {
     gray: '\x1b[90m',
   };
 
-  tier(tierNumber, tierTitle) {
-    this.currentTier = { number: tierNumber, title: tierTitle };
+  nivel(nivelNumber, nivelTitle) {
+    this.currentNivel = { number: nivelNumber, title: nivelTitle };
     const { bold, cyan, reset, gray } = TestReporter.colors;
     console.log(`\n${bold}${cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}`);
-    console.log(`${bold}${cyan}  TIER ${tierNumber}: ${tierTitle.toUpperCase()}${reset}`);
+    console.log(`${bold}${cyan}  NIVEL ${nivelNumber}: ${nivelTitle.toUpperCase()}${reset}`);
     console.log(`${gray}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${reset}`);
   }
 
   pass(name, details = '') {
     const { green, bold, reset, gray } = TestReporter.colors;
     const item = {
-      tier: this.currentTier ? this.currentTier.number : 0,
+      nivel: this.currentNivel ? this.currentNivel.number : 0,
       name,
       status: 'PASSED',
       details,
@@ -47,7 +47,7 @@ export class TestReporter {
   fail(name, error, details = '') {
     const { red, bold, reset, gray } = TestReporter.colors;
     const item = {
-      tier: this.currentTier ? this.currentTier.number : 0,
+      nivel: this.currentNivel ? this.currentNivel.number : 0,
       name,
       status: 'FAILED',
       error: error?.message || String(error),
@@ -69,7 +69,7 @@ export class TestReporter {
   skip(name, reason = '') {
     const { yellow, bold, reset, gray } = TestReporter.colors;
     const item = {
-      tier: this.currentTier ? this.currentTier.number : 0,
+      nivel: this.currentNivel ? this.currentNivel.number : 0,
       name,
       status: 'SKIPPED',
       details: reason,
@@ -102,17 +102,17 @@ export class TestReporter {
     console.log(`  Skipped     : ${yellow}${bold}${skipped}${reset}`);
     console.log(`  Duration    : ${duration}s`);
 
-    // Tier breakdown
-    console.log(`\n  Tier Breakdown:`);
+    // Nivel breakdown
+    console.log(`\n  Nivel Breakdown:`);
     for (let t = 1; t <= 4; t++) {
-      const tierTests = this.results.filter((r) => r.tier === t);
-      if (tierTests.length > 0) {
-        const tPass = tierTests.filter((r) => r.status === 'PASSED').length;
-        const tFail = tierTests.filter((r) => r.status === 'FAILED').length;
-        const tSkip = tierTests.filter((r) => r.status === 'SKIPPED').length;
+      const nivelTests = this.results.filter((r) => r.nivel === t);
+      if (nivelTests.length > 0) {
+        const tPass = nivelTests.filter((r) => r.status === 'PASSED').length;
+        const tFail = nivelTests.filter((r) => r.status === 'FAILED').length;
+        const tSkip = nivelTests.filter((r) => r.status === 'SKIPPED').length;
         const statusColor = tFail > 0 ? red : green;
         console.log(
-          `    Tier ${t}: ${statusColor}${tPass}/${tierTests.length} passed${reset}` +
+          `    Nivel ${t}: ${statusColor}${tPass}/${nivelTests.length} passed${reset}` +
             (tFail > 0 ? ` (${tFail} failed)` : '') +
             (tSkip > 0 ? ` (${tSkip} skipped)` : '')
         );
@@ -124,7 +124,7 @@ export class TestReporter {
       this.results
         .filter((r) => r.status === 'FAILED')
         .forEach((r, idx) => {
-          console.log(`    ${idx + 1}. [Tier ${r.tier}] ${r.name}`);
+          console.log(`    ${idx + 1}. [Nivel ${r.nivel}] ${r.name}`);
           console.log(`       ${red}↳ ${r.error}${reset}`);
         });
     }
