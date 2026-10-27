@@ -1,0 +1,46 @@
+## 4.1 Campos de texto libre que se muestran a otros usuarios: nombre de usuario, nombre/descripcion de producto y categoria, direccion de envio
+Payload: <img src=x onerror="alert('XSS')">
+
+$ POST /api/v1/auth/registro {"nombre":"<img src=x onerror=\"alert('XSS')\">Mario", ...}
+{"id":4,"nombre":"Mario","email":"mario.lab@correo.com","rol":"CLIENTE"}
+-> HTTP 201
+
+$ (admin) POST /api/v1/categorias con el payload en nombre y descripcion
+{"id":5,"nombre":"Resenas","descripcion":"Comentarios","creadoEn":"2026-10-27T22:27:19.444209513"}
+-> HTTP 201
+
+$ (admin) POST /api/v1/productos con imagenUrl javascript:
+{"timestamp":"2026-10-27T22:27:19.528697472","status":400,"error":"Bad Request","mensaje":"Hay datos invalidos en la solicitud","ruta":"/api/v1/productos","campos":{"imagenUrl":"La imagen debe ser una URL http(s)"}}
+-> HTTP 400
+
+$ (admin) POST /api/v1/categorias solo con el payload (queda vacio)
+{"timestamp":"2026-10-27T22:27:19.567574264","status":400,"error":"Bad Request","mensaje":"El nombre no puede quedar vacio ni contener solo HTML","ruta":"/api/v1/categorias","campos":{"nombre":"El nombre no puede quedar vacio ni contener solo HTML"}}
+-> HTTP 400
+
+## 4.3 Cabeceras de seguridad en cualquier respuesta
+$ curl -skI https://localhost:8443/api/v1/productos
+X-Content-Type-Options: nosniff
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Strict-Transport-Security: max-age=300 ; includeSubDomains
+X-Frame-Options: DENY
+Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
+Referrer-Policy: strict-origin-when-cross-origin
+
+## 4.3 Prueba de defensa en profundidad en Chromium (docs/laboratorio/demo-csp.mjs)
+$ node docs/laboratorio/demo-csp.mjs
+
+## innerHTML vulnerable SIN Content-Security-Policy
+URL: https://sin-csp.local/
+Content-Security-Policy: (sin CSP)
+Alertas ejecutadas: XSS
+Consola: (vacia)
+
+## innerHTML vulnerable CON la Content-Security-Policy del servidor
+URL: https://localhost:8443/api/v1/productos
+Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
+Alertas ejecutadas: ninguna
+Consola: Executing inline event handler violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. The action has been blocked.
+
+## Correccion con textContent (sin CSP)
+HTML resultante: <p>&lt;img src=x onerror="alert('XSS')"&gt;</p>
+Imagenes creadas: 0

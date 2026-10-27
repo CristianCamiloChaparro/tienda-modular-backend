@@ -25,6 +25,16 @@ describe('ProductCard Component', () => {
     expect(screen.getByText('En stock (25)')).toBeDefined();
   });
 
+  it('muestra el HTML escrito por un usuario como texto literal, sin ejecutarlo (XSS)', () => {
+    const ataque = `<img src=x onerror="alert('XSS')">`;
+    const { container } = render(
+      <ProductCard producto={{ ...baseProducto, nombre: ataque, descripcion: ataque, imagenUrl: null }} />,
+    );
+
+    expect(screen.getAllByText(ataque)).toHaveLength(2);
+    expect(container.querySelector('img[src="x"]')).toBeNull();
+  });
+
   it('formats COP currency properly with symbol and thousands separator', () => {
     render(<ProductCard producto={baseProducto} />);
     const priceText = screen.getByText(/35/);

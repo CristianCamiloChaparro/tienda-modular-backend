@@ -188,4 +188,29 @@ class SeguridadIntegrationTest {
         cliente.enviar(patch("/api/v1/pedidos/" + pedido + "/estado"), Map.of("estado", "ENTREGADO"), 403);
         admin("10.0.3.8").enviar(patch("/api/v1/pedidos/" + pedido + "/estado"), Map.of("estado", "ENVIADO"), 200);
     }
+
+    // ---------- Parte 4: XSS ----------
+
+    @Test
+    @DisplayName("Parte 4: el HTML en el nombre de usuario se elimina antes de guardarlo")
+    void registro_nombreConHtml_seLimpia() throws Exception {
+        JsonNode usuario = navegador("10.0.4.1").json(post("/api/v1/auth/registro"), Map.of(
+                "nombre", "<img src=x onerror=\"alert('XSS')\">Mario",
+                "email", "xss@correo.com", "password", "ClaveSegura2026"), 201);
+        assertEquals("Mario", usuario.get("nombre").asText());
+        assertEquals("Mario", usuarioRepository.findByEmailIgnoreCase("xss@correo.com").orElseThrow().getNombre());
+    }
+
+    @Test
+    @DisplayName("Parte 4: toda respuesta lleva CSP, nosniff, X-Frame-Options y Referrer-Policy")
+    void cabecerasDeSeguridad() throws Exception {
+        MvcResult respuesta = navegador("10.0.4.2").enviar(get("/api/v1/productos"), null, 200);
+        String csp = respuesta.getResponse().getHeader("Content-Security-Policy");
+        assertNotNull(csp);
+        assertTrue(csp.contains("script-src 'self'") && csp.contains("object-src 'none'")
+                && csp.contains("frame-ancestors 'none'"), csp);
+        assertEquals("nosniff", respuesta.getResponse().getHeader("X-Content-Type-Options"));
+        assertEquals("DENY", respuesta.getResponse().getHeader("X-Frame-Options"));
+        assertEquals("strict-origin-when-cross-origin", respuesta.getResponse().getHeader("Referrer-Policy"));
+    }
 }
