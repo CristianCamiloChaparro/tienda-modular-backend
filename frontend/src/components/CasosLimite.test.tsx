@@ -8,7 +8,7 @@ import * as apiModule from '../services/api';
 import type { Producto } from '../types/producto';
 import type { Categoria } from '../types/categoria';
 
-describe('Challenger 2 — Frontend Edge Cases & Contract Resilience', () => {
+describe('Casos límite del frontend y contrato con la API', () => {
   const sampleProduct: Producto = {
     id: 101,
     categoriaId: 1,
@@ -99,7 +99,7 @@ describe('Challenger 2 — Frontend Edge Cases & Contract Resilience', () => {
     });
   });
 
-  describe('2. Out of Stock Badge & Stock Boundary Tiers', () => {
+  describe('2. Out of Stock Badge & Stock Boundaries', () => {
     it('stock = 0: displays "Agotado" with status role and outOfStock styling', () => {
       const productZeroStock: Producto = { ...sampleProduct, stock: 0 };
       render(<ProductCard producto={productZeroStock} />);
@@ -173,8 +173,7 @@ describe('Challenger 2 — Frontend Edge Cases & Contract Resilience', () => {
       );
 
       expect(screen.getByRole('alert')).toBeDefined();
-      expect(screen.getByText('Error de conexión con el backend')).toBeDefined();
-      expect(screen.getByText('http://localhost:8080')).toBeDefined();
+      expect(screen.getByText('No pudimos cargar la tienda')).toBeDefined();
       expect(screen.getByText('Conexión rechazada por el host remoto')).toBeDefined();
 
       const button = screen.getByRole('button', { name: /reintentar conexión/i });
@@ -207,7 +206,7 @@ describe('Challenger 2 — Frontend Edge Cases & Contract Resilience', () => {
       const onRetry = vi.fn();
       render(<ErrorState onRetry={onRetry} />);
 
-      expect(screen.getByText('Error de conexión con el backend')).toBeDefined();
+      expect(screen.getByText('No pudimos cargar la tienda')).toBeDefined();
       expect(screen.getByRole('button', { name: /reintentar conexión/i })).toBeDefined();
     });
   });
@@ -342,7 +341,7 @@ describe('Challenger 2 — Frontend Edge Cases & Contract Resilience', () => {
       render(<App />);
 
       await waitFor(() => {
-        expect(screen.getByText('Error de conexión con el backend')).toBeDefined();
+        expect(screen.getByText('No pudimos cargar la tienda')).toBeDefined();
       });
 
       expect(screen.getByText('Network connection refused')).toBeDefined();
@@ -355,7 +354,7 @@ describe('Challenger 2 — Frontend Edge Cases & Contract Resilience', () => {
         expect(screen.getByText('Camisa')).toBeDefined();
       });
 
-      expect(screen.queryByText('Error de conexión con el backend')).toBeNull();
+      expect(screen.queryByText('No pudimos cargar la tienda')).toBeNull();
     });
 
     it('App transitions to EmptyState when category has 0 products, and resets on button click', async () => {

@@ -11,7 +11,16 @@ const CSRF_COOKIE = 'XSRF-TOKEN';
 const CSRF_HEADER = 'X-XSRF-TOKEN';
 
 export const MENSAJE_SIN_CONEXION =
-  'No se pudo conectar con el servidor backend. Verifica que el servicio esté en ejecución.';
+  'No se pudo conectar con el servidor backend. Puede estar iniciando; intenta de nuevo en un momento.';
+
+/**
+ * En el plan gratuito de Render el backend se apaga sin visitas y tarda ~1 minuto en encender.
+ * Mientras tanto el proxy responde 502/503/504: las lecturas (GET) se reintentan solas.
+ */
+export const arranqueServidor = { reintentos: 12, esperaMs: 5000 };
+const ESTADOS_ARRANQUE = [502, 503, 504];
+
+const esperar = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export class ApiException extends Error {
   status?: number;
@@ -62,6 +71,24 @@ async function leerError(response: Response): Promise<ApiError | undefined> {
 
 export async function request<T>(path: string, opciones: Opciones = {}, reintentar = true): Promise<T> {
   const method = opciones.method ?? 'GET';
+  if (method === 'GET') {
+    for (let intento = 0; ; intento++) {
+      try {
+        return await enviar<T>(path, opciones, reintentar);
+      } catch (err) {
+        const arrancando = err instanceof ApiException && ESTADOS_ARRANQUE.includes(err.status ?? 0);
+        if (!arrancando || intento >= arranqueServidor.reintentos) {
+          throw err;
+        }
+        await esperar(arranqueServidor.esperaMs);
+      }
+    }
+  }
+  return enviar<T>(path, opciones, reintentar);
+}
+
+async function enviar<T>(path: string, opciones: Opciones, reintentar: boolean): Promise<T> {
+  const method = opciones.method ?? 'GET';
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (opciones.body !== undefined) {
     headers['Content-Type'] = 'application/json';
@@ -89,7 +116,7 @@ export async function request<T>(path: string, opciones: Opciones = {}, reintent
     // Token CSRF vencido (p. ej. la sesión expiró): se pide uno nuevo y se reintenta una vez.
     if (response.status === 403 && reintentar && apiError?.mensaje?.includes('CSRF')) {
       await obtenerTokenCsrf(true);
-      return request<T>(path, opciones, false);
+      return enviar<T>(path, opciones, false);
     }
     const message =
       apiError?.mensaje ||

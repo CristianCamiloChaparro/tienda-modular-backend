@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { request, ApiException } from './http';
+import { request, ApiException, arranqueServidor } from './http';
 
 const respuesta = (status: number, body?: unknown) =>
   ({
@@ -82,6 +82,28 @@ describe('Cliente HTTP (src/services/http.ts)', () => {
       .mockResolvedValue(respuesta(403, { status: 403, mensaje: 'No tienes permisos para realizar esta operacion' }));
 
     await expect(request('/productos/1', { method: 'DELETE' })).rejects.toThrow(ApiException);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('mientras el servidor arranca (502) reintenta las lecturas hasta que responde', async () => {
+    const original = { ...arranqueServidor };
+    Object.assign(arranqueServidor, { reintentos: 3, esperaMs: 0 });
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValueOnce(respuesta(502))
+      .mockResolvedValueOnce(respuesta(503))
+      .mockResolvedValueOnce(respuesta(200, [{ id: 1 }]));
+
+    await expect(request('/categorias')).resolves.toEqual([{ id: 1 }]);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(3);
+    Object.assign(arranqueServidor, original);
+  });
+
+  it('las escrituras no se reintentan ante un 502', async () => {
+    document.cookie = 'XSRF-TOKEN=t; path=/';
+    globalThis.fetch = vi.fn().mockResolvedValue(respuesta(502));
+
+    await expect(request('/carritos', { method: 'POST' })).rejects.toThrow(ApiException);
     expect(globalThis.fetch).toHaveBeenCalledTimes(1);
   });
 

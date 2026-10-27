@@ -58,23 +58,6 @@
   max-width: 100%;
 }
 
-.helpTip {
-  background-color: #fffbeb;
-  border: 1px solid #fef3c7;
-  border-radius: $radius-md;
-  padding: $spacing-sm $spacing-md;
-  font-size: 0.825rem;
-  color: #92400e;
-  margin-bottom: $spacing-lg;
-  text-align: left;
-  line-height: 1.4;
-
-  strong {
-    display: block;
-    margin-bottom: 2px;
-  }
-}
-
 .retryBtn {
   display: inline-flex;
   align-items: center;

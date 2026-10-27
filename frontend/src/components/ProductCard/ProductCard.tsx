@@ -11,7 +11,9 @@ interface ProductCardProps {
 const copFormatter = new Intl.NumberFormat('es-CO', {
   style: 'currency',
   currency: 'COP',
+  // Explicito: segun la version de ICU, COP se formatea con 0 o con 2 decimales por defecto.
   minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
 });
 
 export const ProductCard: React.FC<ProductCardProps> = ({ producto, onAgregar }) => {

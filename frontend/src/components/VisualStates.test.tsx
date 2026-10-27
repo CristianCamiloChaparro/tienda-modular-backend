@@ -26,9 +26,8 @@ describe('Visual States', () => {
       );
 
       expect(
-        screen.getByText('Error de conexión con el backend')
+        screen.getByText('No pudimos cargar la tienda')
       ).toBeDefined();
-      expect(screen.getByText('http://localhost:8080')).toBeDefined();
       expect(screen.getByText('Failed to fetch from backend')).toBeDefined();
 
       const retryButton = screen.getByRole('button', {

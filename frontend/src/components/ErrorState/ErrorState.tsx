@@ -32,11 +32,11 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           </svg>
         </div>
 
-        <h2 className={styles.title}>Error de conexión con el backend</h2>
+        <h2 className={styles.title}>No pudimos cargar la tienda</h2>
 
         <p className={styles.description}>
-          No se pudo establecer comunicación con el servidor backend en{' '}
-          <strong>http://localhost:8080</strong>. El servicio parece estar desconectado o inaccesible.
+          El servidor está iniciando o no responde en este momento. Si la tienda llevaba un rato sin
+          visitas, el servidor tarda alrededor de un minuto en encenderse: intenta de nuevo en un momento.
         </p>
 
         {message && (
@@ -44,13 +44,6 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             {message}
           </div>
         )}
-
-        <div className={styles.helpTip}>
-          <strong>Sugerencias para resolver el problema:</strong>
-          • Verifica que el backend Spring Boot esté ejecutándose en el puerto 8080.
-          <br />
-          • Asegúrate de que PostgreSQL esté activo y la base de datos esté disponible.
-        </div>
 
         <button
           type="button"

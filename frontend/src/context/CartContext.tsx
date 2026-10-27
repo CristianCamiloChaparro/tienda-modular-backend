@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { Carrito } from '../types/carrito';
 import {
   actualizarItem,
@@ -92,6 +92,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .finally(() => setCargando(false));
   }, []);
 
+  /**
+   * Las operaciones se encadenan una tras otra: si el usuario hace clic dos veces seguidas,
+   * la segunda espera a la primera. Así no se crean dos carritos ni se muestra una respuesta vieja.
+   */
+  const cola = useRef<Promise<unknown>>(Promise.resolve());
+  const enCola = useCallback(<T,>(operacion: () => Promise<T>): Promise<T> => {
+    const resultado = cola.current.then(operacion, operacion);
+    cola.current = resultado.catch(() => undefined);
+    return resultado;
+  }, []);
+
   /** Devuelve el id del carrito, creándolo si aún no existe. */
   const asegurarCarrito = useCallback(async (): Promise<string> => {
     const id = leerId();
@@ -105,7 +116,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const agregar = useCallback(
-    async (productoId: number, cantidad = 1) => {
+    (productoId: number, cantidad = 1) => enCola(async () => {
       let id = await asegurarCarrito();
       try {
         setCarrito(await agregarItem(id, productoId, cantidad));
@@ -119,30 +130,39 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           throw err;
         }
       }
-    },
-    [asegurarCarrito]
+    }),
+    [asegurarCarrito, enCola]
   );
 
-  const actualizar = useCallback(async (productoId: number, cantidad: number) => {
-    const id = leerId();
-    if (id) {
-      setCarrito(await actualizarItem(id, productoId, cantidad));
-    }
-  }, []);
+  const actualizar = useCallback(
+    (productoId: number, cantidad: number) => enCola(async () => {
+      const id = leerId();
+      if (id) {
+        setCarrito(await actualizarItem(id, productoId, cantidad));
+      }
+    }),
+    [enCola]
+  );
 
-  const quitar = useCallback(async (productoId: number) => {
-    const id = leerId();
-    if (id) {
-      setCarrito(await quitarItem(id, productoId));
-    }
-  }, []);
+  const quitar = useCallback(
+    (productoId: number) => enCola(async () => {
+      const id = leerId();
+      if (id) {
+        setCarrito(await quitarItem(id, productoId));
+      }
+    }),
+    [enCola]
+  );
 
-  const vaciar = useCallback(async () => {
-    const id = leerId();
-    if (id) {
-      setCarrito(await vaciarCarrito(id));
-    }
-  }, []);
+  const vaciar = useCallback(
+    () => enCola(async () => {
+      const id = leerId();
+      if (id) {
+        setCarrito(await vaciarCarrito(id));
+      }
+    }),
+    [enCola]
+  );
 
   const value = useMemo(
     () => ({
