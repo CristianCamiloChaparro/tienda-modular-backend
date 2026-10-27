@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.math.BigDecimal;
 import java.time.Year;
 import java.util.Map;
 
@@ -236,5 +237,44 @@ class SeguridadIntegrationTest {
                         .contentType("application/json").content("{\"nombre\":\"sin-token\"}"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.mensaje").value("Token CSRF ausente o invalido: la peticion fue bloqueada"));
+    }
+
+    // ---------- Parte 7.1: diseno inseguro (A06) ----------
+
+    @Test
+    @DisplayName("Parte 7 / A06: cantidades negativas o cero se rechazan con 400")
+    void cantidadNegativa_400() throws Exception {
+        Navegador visitante = navegador("10.0.7.1");
+        String carritoId = visitante.json(post("/api/v1/carritos"), null, 201).get("id").asText();
+        long productoId = productoConStock().getId();
+
+        visitante.enviar(post("/api/v1/carritos/" + carritoId + "/items"),
+                Map.of("productoId", productoId, "cantidad", -5), 400);
+        visitante.enviar(post("/api/v1/carritos/" + carritoId + "/items"),
+                Map.of("productoId", productoId, "cantidad", 0), 400);
+        visitante.enviar(post("/api/v1/carritos/" + carritoId + "/items"),
+                Map.of("productoId", productoId, "cantidad", 1), 200);
+        visitante.enviar(put("/api/v1/carritos/" + carritoId + "/items/" + productoId),
+                Map.of("cantidad", -5), 400);
+        assertEquals(1, visitante.json(get("/api/v1/carritos/" + carritoId), null, 200).get("totalUnidades").asInt());
+    }
+
+    @Test
+    @DisplayName("Parte 7 / A06: el precio y el total enviados por el cliente se ignoran; se leen de la BD")
+    void precioManipulado_seIgnora() throws Exception {
+        Navegador cliente = cliente("10.0.7.2", "precio@correo.com");
+        Producto producto = productoConStock();
+        String carritoId = cliente.json(post("/api/v1/carritos"), null, 201).get("id").asText();
+
+        JsonNode carrito = cliente.json(post("/api/v1/carritos/" + carritoId + "/items"),
+                Map.of("productoId", producto.getId(), "cantidad", 2, "precio", 1, "total", 1), 200);
+        BigDecimal esperado = producto.getPrecio().multiply(BigDecimal.valueOf(2));
+        assertEquals(0, esperado.compareTo(carrito.get("total").decimalValue()));
+
+        Map<String, Object> pago = Map.of("titular", "CLIENTE", "numeroTarjeta", "4242 4242 4242 4242",
+                "mesExpiracion", 12, "anioExpiracion", Year.now().getValue() + 2, "cvv", "123");
+        JsonNode pedido = cliente.json(post("/api/v1/pedidos"), Map.of("carritoId", carritoId,
+                "direccionEnvio", "Calle 1", "telefono", "3001234567", "pago", pago, "total", 1), 201);
+        assertEquals(0, esperado.compareTo(pedido.get("total").decimalValue()));
     }
 }

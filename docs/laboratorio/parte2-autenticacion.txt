@@ -58,3 +58,9 @@ Retry-After: 900
 2026-10-27T22:24:23.851Z WARN Inicio de sesion fallido para 'laura.lab@correo.com' desde 127.0.0.1
 2026-10-27T22:24:23.888Z WARN Inicio de sesion bloqueado por exceso de intentos desde 127.0.0.1
 2026-10-27T22:24:23.923Z WARN Inicio de sesion bloqueado por exceso de intentos desde 127.0.0.1
+
+## Prueba de que HttpOnly funciona (frontend real en Chromium, despues de registrarse e iniciar sesion)
+Cookies del navegador: JSESSIONID(HttpOnly=true,SameSite=Strict) XSRF-TOKEN(HttpOnly=false,SameSite=Strict)
+> document.cookie
+'XSRF-TOKEN=<valor>'        <- la cookie de sesion JSESSIONID NO aparece: un script (XSS) no puede leerla
+Con una contrasena de 9 caracteres el formulario de registro no deja continuar (minLength=10 + validacion del servidor).

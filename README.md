@@ -8,6 +8,7 @@ Backend desacoplado del proyecto **Tienda en Línea Modular**. Expone datos en J
 |---|---|
 | [docs/DOCUMENTO_TECNICO.md](docs/DOCUMENTO_TECNICO.md) | Problema, objetivos, alcance, requerimientos, modelo de datos, arquitectura, metodología, pruebas y criterios de aceptación |
 | [docs/SEGURIDAD.md](docs/SEGURIDAD.md) | HTTPS, XSS y CSRF con un caso demostrable para cada uno |
+| [INFORME_SEGURIDAD.md](INFORME_SEGURIDAD.md) ([PDF](docs/INFORME_SEGURIDAD.pdf)) | Laboratorio de seguridad: diagnóstico, hallazgos OWASP Top 10, evidencias, matriz de riesgos y preguntas finales |
 | [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md) | Desarrollo local, Docker Compose con HTTPS y despliegue en Render |
 
 ## Funcionalidades
