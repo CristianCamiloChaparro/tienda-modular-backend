@@ -12,7 +12,7 @@ public record LoginRequest(
         @Email(message = "El correo no tiene un formato valido")
         String email,
 
-        @Schema(example = "Clave1234")
+        @Schema(example = "Clave12345")
         @NotBlank(message = "La contrasena es obligatoria")
         String password
 ) {

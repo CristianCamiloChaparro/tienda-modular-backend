@@ -4,18 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tienda.modular.model.Producto;
 import com.tienda.modular.repository.ProductoRepository;
-import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.math.BigDecimal;
 import java.time.Year;
@@ -45,31 +41,8 @@ class FlujoCompraIntegrationTest {
     @Autowired
     private ProductoRepository productoRepository;
 
-    /** Simula el navegador: guarda la sesion y la cookie XSRF-TOKEN, y envia la cabecera X-XSRF-TOKEN. */
-    private final class Navegador {
-        private final MockHttpSession sesion = new MockHttpSession();
-        private Cookie xsrf;
-
-        MvcResult enviar(MockHttpServletRequestBuilder peticion, Object cuerpo, int estadoEsperado) throws Exception {
-            if (xsrf == null) {
-                xsrf = mockMvc.perform(get("/api/v1/auth/csrf").session(sesion)).andReturn()
-                        .getResponse().getCookie("XSRF-TOKEN");
-            }
-            peticion.session(sesion).cookie(xsrf).header("X-XSRF-TOKEN", xsrf.getValue());
-            if (cuerpo != null) {
-                peticion.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(cuerpo));
-            }
-            MvcResult resultado = mockMvc.perform(peticion).andExpect(status().is(estadoEsperado)).andReturn();
-            Cookie nueva = resultado.getResponse().getCookie("XSRF-TOKEN");
-            if (nueva != null && !nueva.getValue().isEmpty()) {
-                xsrf = nueva;
-            }
-            return resultado;
-        }
-
-        JsonNode json(MockHttpServletRequestBuilder peticion, Object cuerpo, int estadoEsperado) throws Exception {
-            return objectMapper.readTree(enviar(peticion, cuerpo, estadoEsperado).getResponse().getContentAsString());
-        }
+    private Navegador navegador() {
+        return new Navegador(mockMvc, objectMapper);
     }
 
     private Map<String, Object> pago(String numero) {
@@ -82,7 +55,7 @@ class FlujoCompraIntegrationTest {
     void sinTokenCsrf_seBloquea() throws Exception {
         mockMvc.perform(post("/api/v1/auth/registro")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nombre\":\"Ana\",\"email\":\"ana@correo.com\",\"password\":\"Clave1234\"}"))
+                        .content("{\"nombre\":\"Ana\",\"email\":\"ana@correo.com\",\"password\":\"Clave12345\"}"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.mensaje", containsString("CSRF")));
     }
@@ -90,9 +63,9 @@ class FlujoCompraIntegrationTest {
     @Test
     @DisplayName("Cliente: registro -> carrito -> pago rechazado -> pago aprobado -> stock descontado")
     void flujoCompletoDeCompra() throws Exception {
-        Navegador cliente = new Navegador();
+        Navegador cliente = navegador();
         cliente.enviar(post("/api/v1/auth/registro"),
-                Map.of("nombre", "Laura Gomez", "email", "laura@correo.com", "password", "Clave1234"), 201);
+                Map.of("nombre", "Laura Gomez", "email", "laura@correo.com", "password", "Clave12345"), 201);
         cliente.enviar(get("/api/v1/auth/me"), null, 200);
 
         // Un cliente no puede administrar el catalogo
@@ -140,10 +113,10 @@ class FlujoCompraIntegrationTest {
     @Test
     @DisplayName("Admin: crea categoria y producto; el HTML malicioso se elimina antes de guardar")
     void adminGestionaCatalogoYSeMitigaXss() throws Exception {
-        Navegador anonimo = new Navegador();
+        Navegador anonimo = navegador();
         anonimo.enviar(post("/api/v1/auth/login"), Map.of("email", "admin@tienda.com", "password", "incorrecta1"), 401);
 
-        Navegador admin = new Navegador();
+        Navegador admin = navegador();
         JsonNode usuario = admin.json(post("/api/v1/auth/login"),
                 Map.of("email", "admin@tienda.com", "password", "ClaveSoloPruebas1"), 200);
         assertEquals("ADMIN", usuario.get("rol").asText());
@@ -165,7 +138,7 @@ class FlujoCompraIntegrationTest {
                 "imagenUrl", "javascript:alert(1)"), 400);
 
         // El producto se puede eliminar aunque este en un carrito
-        Navegador visitante = new Navegador();
+        Navegador visitante = navegador();
         String carritoId = visitante.json(post("/api/v1/carritos"), null, 201).get("id").asText();
         visitante.enviar(post("/api/v1/carritos/" + carritoId + "/items"),
                 Map.of("productoId", producto.get("id").asLong(), "cantidad", 1), 200);

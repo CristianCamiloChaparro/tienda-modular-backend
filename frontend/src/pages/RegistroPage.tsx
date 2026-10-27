@@ -98,14 +98,14 @@ export const RegistroPage: React.FC = () => {
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            minLength={8}
+            minLength={10}
             maxLength={72}
             required
             aria-invalid={Boolean(campos.password)}
             aria-describedby="password-hint"
           />
           <span className="field-hint" id="password-hint">
-            Mínimo 8 caracteres, con al menos una letra y un número.
+            Mínimo 10 caracteres, con al menos una letra y un número.
           </span>
           {errorDe('password')}
         </div>

@@ -1,0 +1,60 @@
+## 2.2 Registro: el rol lo asigna el servidor (se envia "rol":"ADMIN" y se ignora)
+$ POST /api/v1/auth/registro {"nombre":"Laura","email":"laura.lab@correo.com","password":"ClaveSegura2026","rol":"ADMIN"}
+{"id":2,"nombre":"Laura","email":"laura.lab@correo.com","rol":"CLIENTE"}
+-> HTTP 201
+
+$ POST /api/v1/auth/registro con clave de 9 caracteres
+{"timestamp":"2026-10-27T22:24:20.81925118","status":400,"error":"Bad Request","mensaje":"Hay datos invalidos en la solicitud","ruta":"/api/v1/auth/registro","campos":{"password":"La contrasena debe tener entre 10 y 72 caracteres"}}
+-> HTTP 400
+
+## 2.2 Como quedo guardada la contrasena en PostgreSQL
+$ psql -c "SELECT email, rol, password_hash FROM usuarios WHERE email='laura.lab@correo.com'"
+        email         |   rol   |                        password_hash                         
+----------------------+---------+--------------------------------------------------------------
+ laura.lab@correo.com | CLIENTE | $2a$12$gG12E5F9jtwz9H7PST90seVZP4qzvYr8qZneT4Dk7l6EbqQoKJGmK
+(1 row)
+
+## 2.3 Login correcto: cookie de sesion con HttpOnly, Secure y SameSite=Strict
+$ curl -i POST /api/v1/auth/login (cabeceras Set-Cookie)
+HTTP/1.1 200 
+Set-Cookie: JSESSIONID=<valor>; Path=/; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: XSRF-TOKEN=<valor>; Path=/; Secure; SameSite=Lax
+{"id":2,"nombre":"Laura","email":"laura.lab@correo.com","rol":"CLIENTE"}
+
+## 2.4 Ruta privada sin sesion
+$ GET /api/v1/pedidos/mios (sin sesion)
+{"timestamp":"2026-10-27T22:24:21.792486284","status":401,"error":"Unauthorized","mensaje":"Debes iniciar sesion para realizar esta operacion","ruta":"/api/v1/pedidos/mios","campos":null}
+-> HTTP 401
+
+## 2.5 Seis intentos seguidos con clave incorrecta
+intento 1:
+{"timestamp":"2026-10-27T22:24:22.196870081","status":401,"error":"Unauthorized","mensaje":"Correo o contrasena incorrectos","ruta":"/api/v1/auth/login","campos":null}
+-> HTTP 401
+intento 2:
+{"timestamp":"2026-10-27T22:24:22.605111766","status":401,"error":"Unauthorized","mensaje":"Correo o contrasena incorrectos","ruta":"/api/v1/auth/login","campos":null}
+-> HTTP 401
+intento 3:
+{"timestamp":"2026-10-27T22:24:23.01238728","status":401,"error":"Unauthorized","mensaje":"Correo o contrasena incorrectos","ruta":"/api/v1/auth/login","campos":null}
+-> HTTP 401
+intento 4:
+{"timestamp":"2026-10-27T22:24:23.438324558","status":401,"error":"Unauthorized","mensaje":"Correo o contrasena incorrectos","ruta":"/api/v1/auth/login","campos":null}
+-> HTTP 401
+intento 5:
+{"timestamp":"2026-10-27T22:24:23.852589773","status":401,"error":"Unauthorized","mensaje":"Correo o contrasena incorrectos","ruta":"/api/v1/auth/login","campos":null}
+-> HTTP 401
+intento 6:
+{"timestamp":"2026-10-27T22:24:23.889074705","status":429,"error":"Too Many Requests","mensaje":"Demasiados intentos fallidos. Espere 15 minutos e intente de nuevo","ruta":"/api/v1/auth/login","campos":null}
+-> HTTP 429
+
+$ curl -i (sexto intento, cabeceras)
+HTTP/1.1 429 
+Retry-After: 900
+
+## Registro del servidor (A09): intentos fallidos y bloqueo
+2026-10-27T22:24:22.195Z WARN Inicio de sesion fallido para 'laura.lab@correo.com' desde 127.0.0.1
+2026-10-27T22:24:22.603Z WARN Inicio de sesion fallido para 'laura.lab@correo.com' desde 127.0.0.1
+2026-10-27T22:24:23.011Z WARN Inicio de sesion fallido para 'laura.lab@correo.com' desde 127.0.0.1
+2026-10-27T22:24:23.437Z WARN Inicio de sesion fallido para 'laura.lab@correo.com' desde 127.0.0.1
+2026-10-27T22:24:23.851Z WARN Inicio de sesion fallido para 'laura.lab@correo.com' desde 127.0.0.1
+2026-10-27T22:24:23.888Z WARN Inicio de sesion bloqueado por exceso de intentos desde 127.0.0.1
+2026-10-27T22:24:23.923Z WARN Inicio de sesion bloqueado por exceso de intentos desde 127.0.0.1

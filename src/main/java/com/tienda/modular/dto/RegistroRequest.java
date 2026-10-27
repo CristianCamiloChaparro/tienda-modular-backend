@@ -20,9 +20,10 @@ public record RegistroRequest(
         @Size(max = 150, message = "El correo no puede superar 150 caracteres")
         String email,
 
-        @Schema(description = "Minimo 8 caracteres, con al menos una letra y un numero", example = "Clave1234")
+        @Schema(description = "Minimo 10 caracteres, con al menos una letra y un numero", example = "Clave12345")
         @NotBlank(message = "La contrasena es obligatoria")
-        @Size(min = 8, max = 72, message = "La contrasena debe tener entre 8 y 72 caracteres")
+        // 72 es el maximo que BCrypt tiene en cuenta
+        @Size(min = 10, max = 72, message = "La contrasena debe tener entre 10 y 72 caracteres")
         @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "La contrasena debe tener al menos una letra y un numero")
         String password
 ) {

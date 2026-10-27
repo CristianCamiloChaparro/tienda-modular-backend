@@ -87,8 +87,11 @@ Página atacante de ejemplo (guardarla como `ataque.html`, abrirla desde otro or
 
 | Medida | Detalle |
 |---|---|
-| Contraseñas | Hash BCrypt; mínimo 8 caracteres con letra y número |
+| Contraseñas | Hash BCrypt de costo 12 con sal; mínimo 10 caracteres con letra y número |
 | Mensaje de login | "Correo o contraseña incorrectos" en ambos casos: no revela qué correos existen |
+| Fuerza bruta | Máximo 5 intentos fallidos por IP cada 15 minutos; el sexto responde **429** con `Retry-After` (`LimitadorLogin`) |
+| Registro de eventos | Cada intento fallido y cada bloqueo se escribe en el log (`WARN`) con la IP |
+| Sesión | Cookie `JSESSIONID` `HttpOnly`, `Secure` y `SameSite=Strict`; vence tras 15 minutos sin actividad |
 | Fijación de sesión | Nuevo id de sesión al autenticarse (`changeSessionId`) |
 | Autorización | Reglas por rol en el servidor (`SecurityConfig`); el frontend solo oculta botones, la API es la que bloquea (401/403) |
 | Pedidos ajenos | Un cliente que pide el pedido de otro recibe 404 (no se confirma que exista) |

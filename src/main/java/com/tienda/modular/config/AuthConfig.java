@@ -13,9 +13,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class AuthConfig {
 
+    /** Costo 12 (2^12 rondas): hash lento con sal propia; los hashes de costo 10 ya guardados siguen siendo validos. */
+    static final int COSTO_BCRYPT = 12;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(COSTO_BCRYPT);
     }
 
     @Bean

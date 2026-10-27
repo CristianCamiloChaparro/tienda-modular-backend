@@ -2,6 +2,7 @@ package com.tienda.modular.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -38,6 +39,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PagoRechazadoException.class)
     public ResponseEntity<ApiError> pagoRechazado(PagoRechazadoException ex, HttpServletRequest req) {
         return construir(HttpStatus.PAYMENT_REQUIRED, ex.getMessage(), req, null);
+    }
+
+    @ExceptionHandler(DemasiadosIntentosException.class)
+    public ResponseEntity<ApiError> demasiadosIntentos(DemasiadosIntentosException ex, HttpServletRequest req) {
+        ResponseEntity<ApiError> respuesta = construir(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), req, null);
+        return ResponseEntity.status(respuesta.getStatusCode())
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getEspera().toSeconds()))
+                .body(respuesta.getBody());
     }
 
     @ExceptionHandler(AuthenticationException.class)

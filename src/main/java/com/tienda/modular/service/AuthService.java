@@ -4,18 +4,23 @@ import com.tienda.modular.dto.LoginRequest;
 import com.tienda.modular.dto.RegistroRequest;
 import com.tienda.modular.dto.UsuarioResponse;
 import com.tienda.modular.exception.DatoInvalidoException;
+import com.tienda.modular.exception.DemasiadosIntentosException;
 import com.tienda.modular.exception.ReglaNegocioException;
 import com.tienda.modular.model.Rol;
 import com.tienda.modular.model.Usuario;
 import com.tienda.modular.repository.UsuarioRepository;
+import com.tienda.modular.security.LimitadorLogin;
 import com.tienda.modular.security.UsuarioAutenticado;
 import com.tienda.modular.util.TextoSeguro;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,18 +34,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthService {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final CsrfTokenRepository csrfTokenRepository;
+    private final LimitadorLogin limitadorLogin;
     private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
     public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder,
-                       AuthenticationManager authenticationManager, CsrfTokenRepository csrfTokenRepository) {
+                       AuthenticationManager authenticationManager, CsrfTokenRepository csrfTokenRepository,
+                       LimitadorLogin limitadorLogin) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.csrfTokenRepository = csrfTokenRepository;
+        this.limitadorLogin = limitadorLogin;
     }
 
     @Transactional
@@ -59,9 +69,23 @@ public class AuthService {
     }
 
     public UsuarioResponse login(LoginRequest datos, HttpServletRequest request, HttpServletResponse response) {
-        // Lanza BadCredentialsException (401) si el correo o la contrasena no coinciden.
-        Authentication autenticacion = authenticationManager.authenticate(
-                UsernamePasswordAuthenticationToken.unauthenticated(datos.email().trim(), datos.password()));
+        // Detras de un proxy (Render, nginx) es la IP del cliente gracias a server.forward-headers-strategy.
+        String ip = request.getRemoteAddr();
+        if (!limitadorLogin.permitido(ip)) {
+            log.warn("Inicio de sesion bloqueado por exceso de intentos desde {}", ip);
+            throw new DemasiadosIntentosException(LimitadorLogin.VENTANA);
+        }
+        Authentication autenticacion;
+        try {
+            // Lanza BadCredentialsException (401) si el correo o la contrasena no coinciden.
+            autenticacion = authenticationManager.authenticate(
+                    UsernamePasswordAuthenticationToken.unauthenticated(datos.email().trim(), datos.password()));
+        } catch (AuthenticationException ex) {
+            limitadorLogin.registrarFallo(ip);
+            log.warn("Inicio de sesion fallido para '{}' desde {}", paraLog(datos.email()), ip);
+            throw ex;
+        }
+        limitadorLogin.reiniciar(ip);
         return iniciarSesion((UsuarioAutenticado) autenticacion.getPrincipal(), request, response);
     }
 
@@ -88,6 +112,12 @@ public class AuthService {
         securityContextRepository.saveContext(contexto, request, response);
         renovarTokenCsrf(request, response);
         return UsuarioResponse.desde(principal);
+    }
+
+    /** Evita la inyeccion de lineas falsas en el registro (CR/LF) y textos enormes. */
+    private static String paraLog(String texto) {
+        String limpio = texto.replaceAll("[\\r\\n\\t]", "_").trim();
+        return limpio.length() > 150 ? limpio.substring(0, 150) + "..." : limpio;
     }
 
     /** Un token CSRF nuevo despues de cada cambio de sesion. */
