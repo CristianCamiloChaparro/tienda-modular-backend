@@ -80,8 +80,9 @@
 
 .footer {
   @include flex-between;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: $spacing-sm;
+  gap: 2px $spacing-sm;
 }
 
 .priceWrapper {

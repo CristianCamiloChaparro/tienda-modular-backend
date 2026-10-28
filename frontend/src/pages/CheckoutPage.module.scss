@@ -1,57 +1,423 @@
 @use '../styles/variables' as *;
 @use '../styles/mixins' as *;
 
+// Pasos de la compra
+.pasos {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  list-style: none;
+  padding: $spacing-lg 0 0;
+  font-size: 0.82rem;
+  color: $color-text-light;
+  overflow-x: auto;
+}
+
+.paso {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  white-space: nowrap;
+
+  &:not(:last-child)::after {
+    content: '';
+    width: 40px;
+    height: 1px;
+    margin-left: $spacing-sm;
+    background: $color-border-hover;
+
+    @include respond-to(mobile) {
+      width: 16px;
+    }
+  }
+
+  a:hover {
+    color: $color-text-main;
+  }
+}
+
+.pasoNumero {
+  width: 22px;
+  height: 22px;
+  border-radius: $radius-full;
+  border: 1px solid $color-border-hover;
+  @include flex-center;
+  font-size: 0.72rem;
+}
+
+.paso {
+  // En celular solo se lee el nombre del paso actual.
+  @include respond-to(mobile) {
+    &:not(.pasoActual) > :last-child:not(.pasoNumero) {
+      display: none;
+    }
+  }
+}
+
+.pasoHecho {
+  color: $color-text-muted;
+
+  .pasoNumero {
+    background: $color-success;
+    border-color: $color-success;
+    color: $color-text-inverse;
+  }
+}
+
+.pasoActual {
+  color: $color-text-main;
+  font-weight: 600;
+
+  .pasoNumero {
+    background: $color-primary;
+    border-color: $color-primary;
+    color: $color-text-inverse;
+  }
+}
+
+// Diseño general
 .layout {
   display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: $spacing-lg;
+  grid-template-columns: 1fr 380px;
+  gap: $spacing-xl;
   align-items: start;
   padding-bottom: $spacing-2xl;
 
   @include respond-to(tablet) {
     grid-template-columns: 1fr;
 
-    .summary {
+    .resumen {
       order: -1;
+      position: static;
     }
   }
 }
 
-.sectionTitle {
-  font-size: 1.05rem;
+.form {
+  @include flex-column;
+  gap: $spacing-lg;
+}
+
+.bloque {
+  @include panel;
+  padding: $spacing-lg;
+
+  @include respond-to(mobile) {
+    padding: $spacing-md;
+  }
+}
+
+.bloqueCabecera {
+  @include flex-between;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+
+  .bloqueTitulo {
+    margin-bottom: 0;
+  }
+}
+
+.bloqueTitulo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm + 2;
+  @include display(1.35rem);
+  margin-bottom: $spacing-md;
+}
+
+.bloqueNumero {
+  width: 26px;
+  height: 26px;
+  border-radius: $radius-full;
+  background: $color-accent-soft;
+  color: $color-accent;
+  @include flex-center;
+  font-family: $font-family-base;
+  font-size: 0.8rem;
   font-weight: 700;
-  margin: $spacing-sm 0 $spacing-md;
+}
+
+.seguro {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: $color-success;
+}
+
+.envioGrid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 0 $spacing-md;
+
+  @include respond-to(mobile) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Medio de pago
+.metodo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm + 4;
+  padding: 14px $spacing-md;
+  border: 1.5px solid $color-primary;
+  border-radius: $radius-md;
+  background: $color-bg-card;
+  margin-bottom: $spacing-lg;
+  flex-wrap: wrap;
+}
+
+.metodoRadio {
+  width: 18px;
+  height: 18px;
+  border-radius: $radius-full;
+  border: 5px solid $color-primary;
+  flex-shrink: 0;
+}
+
+.metodoNombre {
+  font-weight: 600;
+  font-size: 0.95rem;
+  flex: 1;
+}
+
+.metodoMarcas {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.rechazo {
+  margin-bottom: $spacing-md;
+}
+
+.pagoGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: $spacing-lg;
+  align-items: start;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.previewCol {
+  @include flex-column;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.prueba {
+  width: 100%;
+  max-width: 360px;
+}
+
+.pruebaTitulo {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $color-warning;
+  margin-bottom: $spacing-sm;
+}
+
+.pruebaBotones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-sm;
+}
+
+.pruebaBtn {
+  @include flex-column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 12px;
+  border: 1px dashed $color-border-hover;
+  border-radius: $radius-md;
+  font-size: 0.8rem;
+  text-align: left;
+  transition: border-color $transition-fast, background-color $transition-fast;
+
+  code {
+    font-family: $font-family-mono;
+    font-size: 0.75rem;
+    color: $color-text-muted;
+  }
+
+  &:hover {
+    border-color: $color-primary;
+    background: $color-bg-card;
+  }
+}
+
+.campos {
+  @include flex-column;
+}
+
+.conIcono {
+  position: relative;
+
+  input {
+    padding-right: 64px;
+    font-family: $font-family-mono;
+    letter-spacing: 0.04em;
+  }
+}
+
+.icono {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  pointer-events: none;
+}
+
+.ok {
+  font-size: 0.8rem;
+  color: $color-success;
+  margin-top: 4px;
 }
 
 .cardRow {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: $spacing-sm + 4;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
 }
 
-.summary {
+.pagar {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  font-size: 1rem;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 253, 249, 0.35);
+  border-top-color: $color-text-inverse;
+  border-radius: $radius-full;
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.legal {
+  font-size: 0.78rem;
+  color: $color-text-light;
+  text-align: center;
+  margin-top: -$spacing-sm;
+}
+
+// Resumen del pedido
+.resumen {
+  @include panel;
+  padding: $spacing-lg;
   position: sticky;
   top: 96px;
+  background: $color-bg-surface;
 }
 
-.lines {
+.resumenTitulo {
+  @include display(1.35rem);
+  margin-bottom: $spacing-md;
+}
+
+.lineas {
+  @include flex-column;
+  gap: $spacing-md;
+  list-style: none;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $color-border-hover;
+}
+
+.linea {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: $spacing-sm + 4;
+  align-items: center;
+}
+
+.miniatura {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: $radius-md;
+  background: $color-bg-card;
+  border: 1px solid $color-border;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: $radius-md;
+  }
+}
+
+.cantidad {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: $radius-full;
+  background: $color-text-muted;
+  color: $color-text-inverse;
+  font-size: 0.7rem;
+  font-weight: 700;
+  @include flex-center;
+}
+
+.lineaInfo {
+  @include flex-column;
+  min-width: 0;
+}
+
+.lineaNombre {
+  font-size: 0.9rem;
+  font-weight: 600;
+  @include line-clamp(2);
+}
+
+.lineaMeta {
+  font-size: 0.78rem;
+  color: $color-text-muted;
+}
+
+.lineaPrecio {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.cuentas {
   @include flex-column;
   gap: $spacing-sm;
-}
-
-.line {
-  @include flex-between;
-  gap: $spacing-sm;
+  padding: $spacing-md 0;
   font-size: 0.9rem;
   color: $color-text-muted;
+
+  div {
+    @include flex-between;
+  }
+}
+
+.gratis {
+  color: $color-success;
+  font-weight: 600;
 }
 
 .total {
   @include flex-between;
-  margin-top: $spacing-md;
   padding-top: $spacing-sm + 4;
-  border-top: 1px solid $color-border;
-  font-size: 1.2rem;
+  border-top: 1px solid $color-border-hover;
+  font-size: 1.25rem;
   font-weight: 800;
 }
 
@@ -63,7 +429,103 @@
   color: $color-primary;
 }
 
-code {
-  font-family: $font-family-mono;
-  font-size: 0.85em;
+// Confirmación
+.confirmacion {
+  @include flex-column;
+  align-items: center;
+  text-align: center;
+  gap: $spacing-sm;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: $spacing-2xl 0 $spacing-3xl;
+}
+
+.check {
+  width: 72px;
+  height: 72px;
+  border-radius: $radius-full;
+  background: $color-success;
+  color: $color-text-inverse;
+  @include flex-center;
+  margin-bottom: $spacing-sm;
+  animation: aparecer 0.5s cubic-bezier(0.3, 1.4, 0.5, 1);
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes aparecer {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+
+.confirmacionTitulo {
+  @include display(2.2rem);
+
+  @include respond-to(mobile) {
+    font-size: 1.7rem;
+  }
+}
+
+.confirmacionTexto {
+  color: $color-text-muted;
+}
+
+.recibo {
+  @include panel;
+  width: 100%;
+  margin-top: $spacing-lg;
+  padding: $spacing-lg;
+  text-align: left;
+}
+
+.reciboDatos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $color-border;
+
+  @include respond-to(mobile) {
+    grid-template-columns: 1fr;
+  }
+
+  dt {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: $color-text-light;
+    margin-bottom: 2px;
+  }
+
+  dd {
+    font-size: 0.9rem;
+    font-weight: 600;
+    word-break: break-word;
+  }
+}
+
+.reciboItems {
+  @include flex-column;
+  gap: $spacing-sm;
+  list-style: none;
+  padding: $spacing-md 0;
+  font-size: 0.9rem;
+  color: $color-text-muted;
+
+  li {
+    @include flex-between;
+    gap: $spacing-md;
+  }
+}
+
+.confirmacionAcciones {
+  display: flex;
+  gap: $spacing-sm + 4;
+  margin-top: $spacing-lg;
+  flex-wrap: wrap;
+  justify-content: center;
 }

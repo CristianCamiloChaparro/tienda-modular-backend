@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import type { Categoria } from '../types/categoria';
 import type { Producto } from '../types/producto';
 import { getCategorias, getProductos } from '../services/api';
@@ -12,6 +12,18 @@ import { useToast } from '../context/ToastContext';
 import { mensajeDeError } from '../utils/formato';
 import styles from './CatalogoPage.module.scss';
 
+type Orden = 'recientes' | 'precio-asc' | 'precio-desc' | 'nombre';
+
+const ORDENES: { valor: Orden; etiqueta: string }[] = [
+  { valor: 'recientes', etiqueta: 'Destacados' },
+  { valor: 'precio-asc', etiqueta: 'Precio: menor a mayor' },
+  { valor: 'precio-desc', etiqueta: 'Precio: mayor a menor' },
+  { valor: 'nombre', etiqueta: 'Nombre (A-Z)' },
+];
+
+/** Compara sin tildes ni mayúsculas: "ceramica" encuentra "Cerámica". */
+const normalizar = (texto: string) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
 export const CatalogoPage: React.FC = () => {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [selectedCategoriaId, setSelectedCategoriaId] = useState<number | null>(null);
@@ -19,6 +31,8 @@ export const CatalogoPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [retrying, setRetrying] = useState<boolean>(false);
+  const [busqueda, setBusqueda] = useState('');
+  const [orden, setOrden] = useState<Orden>('recientes');
   const { agregar } = useCart();
   const { notificar } = useToast();
 
@@ -97,6 +111,56 @@ export const CatalogoPage: React.FC = () => {
 
   const selectedCategory = categorias.find((c) => c.id === selectedCategoriaId);
 
+  const visibles = useMemo(() => {
+    const termino = normalizar(busqueda.trim());
+    const filtrados = termino
+      ? productos.filter((p) => normalizar(`${p.nombre} ${p.descripcion} ${p.categoriaNombre}`).includes(termino))
+      : [...productos];
+    if (orden === 'precio-asc') filtrados.sort((a, b) => a.precio - b.precio);
+    if (orden === 'precio-desc') filtrados.sort((a, b) => b.precio - a.precio);
+    if (orden === 'nombre') filtrados.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+    return filtrados;
+  }, [productos, busqueda, orden]);
+
+  const herramientas = (
+    <div className={styles.herramientas}>
+      <label className={styles.buscar}>
+        <span className="visually-hidden">Buscar productos</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </svg>
+        <input
+          type="search"
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          placeholder="Buscar productos"
+        />
+      </label>
+      <label className={styles.ordenar}>
+        <span className="visually-hidden">Ordenar por</span>
+        <select value={orden} onChange={(e) => setOrden(e.target.value as Orden)}>
+          {ORDENES.map((o) => (
+            <option key={o.valor} value={o.valor}>
+              {o.etiqueta}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
+  );
+
+  const sinResultados = (
+    <div className="vacio">
+      <span className="vacio-marca">Búsqueda</span>
+      <h2 className="vacio-titulo">Sin resultados para "{busqueda.trim()}"</h2>
+      <p className="vacio-texto">Prueba con otra palabra o revisa otra categoría.</p>
+      <button type="button" className="btn btn-secondary" onClick={() => setBusqueda('')}>
+        Limpiar búsqueda
+      </button>
+    </div>
+  );
+
   return (
     <div className="container">
       <section className={styles.hero}>
@@ -135,7 +199,12 @@ export const CatalogoPage: React.FC = () => {
       ) : productos.length === 0 ? (
         <EmptyState categoryName={selectedCategory?.nombre} onResetFilter={handleResetFilter} />
       ) : (
-        <ProductGrid productos={productos} onAgregar={handleAgregar} />
+        <ProductGrid
+          productos={visibles}
+          onAgregar={handleAgregar}
+          herramientas={herramientas}
+          sinResultados={sinResultados}
+        />
       )}
     </div>
   );

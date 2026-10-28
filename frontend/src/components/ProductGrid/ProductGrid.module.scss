@@ -7,7 +7,13 @@
 
 .metaBar {
   @include flex-between;
+  gap: $spacing-md;
   margin-bottom: $spacing-lg;
+
+  @include respond-to(mobile) {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
 }
 
 .count {
@@ -26,7 +32,7 @@
   gap: $spacing-2xl $spacing-lg;
 
   @include respond-to(mobile) {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: $spacing-xl $spacing-md;
   }
 }
