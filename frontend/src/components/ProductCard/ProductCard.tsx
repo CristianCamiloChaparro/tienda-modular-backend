@@ -58,8 +58,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ producto, onAgregar })
   return (
     <article className={styles.card}>
       <div className={styles.imageWrapper}>
-        <span className={styles.categoryBadge}>{producto.categoriaNombre}</span>
-
         {showImage ? (
           <img
             src={producto.imagenUrl!}
@@ -91,6 +89,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ producto, onAgregar })
       </div>
 
       <div className={styles.content}>
+        <span className={styles.categoryBadge}>{producto.categoriaNombre}</span>
         <h3 className={styles.title} title={producto.nombre}>
           {producto.nombre}
         </h3>
@@ -100,7 +99,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ producto, onAgregar })
 
         <div className={styles.footer}>
           <div className={styles.priceWrapper}>
-            <span className={styles.priceLabel}>Precio</span>
             <span className={styles.price}>{formattedPrice}</span>
           </div>
 

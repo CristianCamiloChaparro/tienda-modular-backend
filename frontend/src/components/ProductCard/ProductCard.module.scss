@@ -2,29 +2,28 @@
 @use '../../styles/mixins' as *;
 
 .card {
-  @include card-box;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   height: 100%;
 }
 
 .imageWrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 4 / 5;
   background-color: $color-bg-surface;
   overflow: hidden;
+  border-radius: $radius-sm;
 }
 
 .image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
+  transition: transform 0.6s ease;
 
   .card:hover & {
-    transform: scale(1.05);
+    transform: scale(1.03);
   }
 }
 
@@ -34,7 +33,6 @@
   @include flex-center;
   flex-direction: column;
   gap: $spacing-xs;
-  background-color: $color-bg-surface;
   color: $color-text-light;
   padding: $spacing-md;
   text-align: center;
@@ -45,107 +43,99 @@
 
   span {
     font-size: 0.75rem;
-    font-weight: 500;
   }
 }
 
-.categoryBadge {
-  position: absolute;
-  top: $spacing-sm;
-  left: $spacing-sm;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(4px);
-  color: $color-primary;
-  border: 1px solid rgba(37, 99, 235, 0.2);
-  padding: 4px 10px;
-  border-radius: $radius-full;
-  font-size: 0.75rem;
-  font-weight: 600;
-  box-shadow: $shadow-sm;
-  z-index: 2;
-}
-
 .content {
-  padding: $spacing-md;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  padding-top: $spacing-md;
+}
+
+.categoryBadge {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $color-text-light;
+  margin-bottom: 6px;
 }
 
 .title {
-  font-size: 1.05rem;
-  font-weight: 700;
+  @include display(1.25rem);
+  font-weight: 500;
   color: $color-text-main;
-  line-height: 1.3;
-  margin-bottom: $spacing-xs;
+  margin-bottom: 4px;
   @include line-clamp(2);
 }
 
 .description {
   font-size: 0.85rem;
   color: $color-text-muted;
-  line-height: 1.45;
+  line-height: 1.5;
   margin-bottom: $spacing-md;
   flex-grow: 1;
-  @include line-clamp(3);
+  @include line-clamp(2);
 }
 
 .footer {
-  border-top: 1px solid $color-border;
-  padding-top: $spacing-sm;
   @include flex-between;
-  gap: $spacing-xs;
+  align-items: baseline;
+  gap: $spacing-sm;
 }
 
 .priceWrapper {
   display: flex;
-  flex-direction: column;
-}
-
-.priceLabel {
-  font-size: 0.7rem;
-  color: $color-text-muted;
-  text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 0.05em;
 }
 
 .price {
-  font-size: 1.2rem;
-  font-weight: 800;
+  font-size: 1rem;
+  font-weight: 600;
   color: $color-text-main;
-  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
 .stockBadge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: $radius-full;
+  gap: 6px;
   font-size: 0.75rem;
-  font-weight: 600;
   white-space: nowrap;
 
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+  }
+
   &.inStock {
-    background-color: $color-success-bg;
     color: $color-success;
-    border: 1px solid $color-success-border;
   }
 
   &.lowStock {
-    background-color: $color-warning-bg;
     color: $color-warning;
-    border: 1px solid $color-warning-border;
   }
 
   &.outOfStock {
-    background-color: $color-danger-bg;
     color: $color-danger;
-    border: 1px solid $color-danger-border;
   }
 }
 
 .addBtn {
   margin-top: $spacing-md;
+  background-color: transparent !important;
+  color: $color-text-main !important;
+  border: 1px solid $color-text-main !important;
+
+  &:hover:not(:disabled) {
+    background-color: $color-text-main !important;
+    color: $color-text-inverse !important;
+  }
+
+  &:disabled {
+    border-color: $color-border-hover !important;
+    color: $color-text-light !important;
+  }
 }

@@ -100,10 +100,21 @@ export const CatalogoPage: React.FC = () => {
   return (
     <div className="container">
       <section className={styles.hero}>
-        <h1 className={styles.heroTitle}>Catálogo de Productos</h1>
-        <p className={styles.heroDescription}>
-          Explora nuestra selección por categorías, agrega productos al carrito y paga en línea de forma segura.
-        </p>
+        <div>
+          <p className={styles.kicker}>Colección permanente</p>
+          <h1 className={styles.heroTitle}>
+            Básicos bien hechos, <em>para todos los días.</em>
+          </h1>
+        </div>
+        <div className={styles.heroAside}>
+          <p className={styles.heroDescription}>
+            Ropa, accesorios y objetos para la casa. Elige por categoría, arma tu pedido y paga en línea con tarjeta.
+          </p>
+          <ul className={styles.heroFacts}>
+            <li>Inventario actualizado al instante</li>
+            <li>Pago seguro con tarjeta</li>
+          </ul>
+        </div>
       </section>
 
       {/* Category filter bar */}

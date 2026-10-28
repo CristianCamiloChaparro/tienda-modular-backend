@@ -17,9 +17,7 @@
 }
 
 .title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  @include display(2rem);
 }
 
 .subtitle {

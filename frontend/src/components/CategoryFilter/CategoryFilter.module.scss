@@ -2,78 +2,67 @@
 @use '../../styles/mixins' as *;
 
 .filterContainer {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
   padding: $spacing-lg 0 $spacing-md;
+
+  @include respond-to(mobile) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-sm;
+  }
 }
 
 .label {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: $color-text-muted;
-  margin-bottom: $spacing-sm;
-  display: block;
+  color: $color-text-light;
+  white-space: nowrap;
 }
 
 .bar {
   display: flex;
   align-items: center;
-  gap: $spacing-sm;
+  gap: $spacing-lg;
   overflow-x: auto;
-  padding-bottom: $spacing-xs;
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 
   &::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: $color-border;
-    border-radius: $radius-full;
+    display: none;
   }
 }
 
 .filterBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-xs;
-  padding: 8px 16px;
-  border-radius: $radius-full;
-  font-size: 0.875rem;
-  font-weight: 500;
+  position: relative;
+  padding: 6px 0;
+  font-size: 0.95rem;
   white-space: nowrap;
-  background-color: $color-bg-card;
-  color: $color-text-main;
-  border: 1px solid $color-border;
-  transition: all $transition-fast;
+  color: $color-text-muted;
+  transition: color $transition-fast;
   user-select: none;
 
   &:hover {
-    border-color: $color-border-hover;
-    background-color: $color-bg-surface;
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
+    color: $color-text-main;
   }
 
   &.active {
-    background-color: $color-primary;
-    color: $color-text-inverse;
-    border-color: $color-primary;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-    font-weight: 600;
+    color: $color-text-main;
 
-    &:hover {
-      background-color: $color-primary-hover;
-      border-color: $color-primary-hover;
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 2px;
+      background-color: $color-accent;
     }
   }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 }

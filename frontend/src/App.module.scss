@@ -9,18 +9,44 @@
 
 .main {
   flex-grow: 1;
-  padding: $spacing-md 0 $spacing-2xl;
+  padding: 0 0 $spacing-xl;
 }
 
 .footer {
   border-top: 1px solid $color-border;
-  background-color: $color-bg-card;
-  padding: $spacing-md 0;
-  font-size: 0.8rem;
+  padding: $spacing-2xl 0;
   color: $color-text-muted;
+}
 
-  a {
-    color: $color-primary;
-    font-weight: 600;
+.footerInner {
+  @include flex-between;
+  align-items: flex-end;
+  gap: $spacing-lg;
+
+  @include respond-to(mobile) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.footerBrand {
+  @include display(1.5rem);
+  font-style: italic;
+  color: $color-text-main;
+}
+
+.footerText {
+  font-size: 0.8rem;
+  margin-top: $spacing-xs;
+}
+
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-lg;
+  font-size: 0.85rem;
+
+  a:hover {
+    color: $color-text-main;
   }
 }

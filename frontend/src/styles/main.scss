@@ -29,8 +29,8 @@
   padding-right: $spacing-md;
 
   @include respond-to(tablet) {
-    padding-left: $spacing-sm;
-    padding-right: $spacing-sm;
+    padding-left: $spacing-md;
+    padding-right: $spacing-md;
   }
 }
 
@@ -74,9 +74,7 @@
 }
 
 .page-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  @include display(2.25rem);
   color: $color-text-main;
 
   @include respond-to(mobile) {
@@ -153,4 +151,14 @@ textarea.input {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+::selection {
+  background-color: $color-accent-soft;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
 }

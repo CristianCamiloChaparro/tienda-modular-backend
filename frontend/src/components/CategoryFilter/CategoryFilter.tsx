@@ -17,7 +17,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
 }) => {
   return (
     <nav className={styles.filterContainer} aria-label="Filtro de categorías">
-      <span className={styles.label}>Filtrar por categoría:</span>
+      <span className={styles.label}>Categorías</span>
       <div className={styles.bar} role="tablist">
         <button
           type="button"

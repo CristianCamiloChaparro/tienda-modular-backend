@@ -1,40 +1,44 @@
-// Color Palette
-$color-primary: #2563eb;
-$color-primary-hover: #1d4ed8;
-$color-primary-light: #eff6ff;
-$color-primary-border: #bfdbfe;
+// Paleta calida y sobria: papel, tinta y un solo acento terracota.
+$color-primary: #1c1a17;
+$color-primary-hover: #000000;
+$color-primary-light: #f1ece4;
+$color-primary-border: #d9d1c4;
 
-$color-secondary: #0d9488;
-$color-secondary-hover: #0f766e;
+$color-accent: #b5552e;
+$color-accent-soft: #f4e4da;
 
-$color-bg-body: #f8fafc;
-$color-bg-card: #ffffff;
-$color-bg-surface: #f1f5f9;
+$color-secondary: #3f6b4e;
+$color-secondary-hover: #32563e;
 
-$color-text-main: #0f172a;
-$color-text-muted: #64748b;
-$color-text-light: #94a3b8;
-$color-text-inverse: #ffffff;
+$color-bg-body: #f7f4ef;
+$color-bg-card: #fffdf9;
+$color-bg-surface: #efeae2;
 
-$color-border: #e2e8f0;
-$color-border-hover: #cbd5e1;
+$color-text-main: #1c1a17;
+$color-text-muted: #6e675d;
+$color-text-light: #a39b8f;
+$color-text-inverse: #fffdf9;
+
+$color-border: #e4ddd2;
+$color-border-hover: #cfc6b8;
 
 // Status colors
-$color-success: #16a34a;
-$color-success-bg: #dcfce7;
-$color-success-border: #bbf7d0;
+$color-success: #3f6b4e;
+$color-success-bg: #e7efe7;
+$color-success-border: #c9dccb;
 
-$color-warning: #d97706;
-$color-warning-bg: #fef3c7;
-$color-warning-border: #fde68a;
+$color-warning: #9a6a1e;
+$color-warning-bg: #f6eedc;
+$color-warning-border: #e8d6ae;
 
-$color-danger: #dc2626;
-$color-danger-hover: #b91c1c;
-$color-danger-bg: #fee2e2;
-$color-danger-border: #fecaca;
+$color-danger: #a63d2a;
+$color-danger-hover: #87301f;
+$color-danger-bg: #f7e6e1;
+$color-danger-border: #ebc7bd;
 
-// Typography
-$font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+// Typography (fuentes alojadas en el propio proyecto: no dependen de CDN y respetan la CSP)
+$font-family-base: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+$font-family-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
 $font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
 // Spacing
@@ -44,24 +48,25 @@ $spacing-md: 16px;
 $spacing-lg: 24px;
 $spacing-xl: 32px;
 $spacing-2xl: 48px;
+$spacing-3xl: 80px;
 
-// Border Radius
-$radius-xs: 4px;
-$radius-sm: 6px;
-$radius-md: 10px;
-$radius-lg: 16px;
-$radius-xl: 20px;
+// Border Radius: casi rectos
+$radius-xs: 2px;
+$radius-sm: 3px;
+$radius-md: 4px;
+$radius-lg: 6px;
+$radius-xl: 8px;
 $radius-full: 9999px;
 
-// Shadows
-$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-$shadow-hover: 0 12px 24px -4px rgba(0, 0, 0, 0.12), 0 6px 12px -3px rgba(0, 0, 0, 0.08);
+// Shadows: casi nada; la separacion la dan las lineas y el espacio
+$shadow-sm: none;
+$shadow-md: 0 1px 2px rgba(28, 26, 23, 0.06);
+$shadow-lg: 0 8px 24px rgba(28, 26, 23, 0.08);
+$shadow-hover: none;
 
 // Transitions
 $transition-fast: 0.15s ease;
-$transition-default: 0.25s ease-in-out;
+$transition-default: 0.25s ease;
 
 // Breakpoints
 $bp-mobile: 576px;

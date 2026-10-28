@@ -2,33 +2,31 @@
 @use '../../styles/mixins' as *;
 
 .section {
-  padding-bottom: $spacing-2xl;
+  padding-bottom: $spacing-3xl;
 }
 
 .metaBar {
   @include flex-between;
-  margin-bottom: $spacing-md;
-  padding-bottom: $spacing-xs;
-  border-bottom: 1px solid $color-border;
+  margin-bottom: $spacing-lg;
 }
 
 .count {
-  font-size: 0.9rem;
-  color: $color-text-muted;
-  font-weight: 500;
+  font-size: 0.8rem;
+  color: $color-text-light;
 
   strong {
-    color: $color-text-main;
+    color: $color-text-muted;
+    font-weight: 500;
   }
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: $spacing-lg;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: $spacing-2xl $spacing-lg;
 
   @include respond-to(mobile) {
-    grid-template-columns: 1fr;
-    gap: $spacing-md;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-xl $spacing-md;
   }
 }

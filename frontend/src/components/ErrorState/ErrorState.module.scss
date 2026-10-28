@@ -68,13 +68,10 @@
   font-size: 0.95rem;
   padding: 10px 24px;
   border-radius: $radius-full;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
   transition: all $transition-default;
 
   &:hover {
     background-color: $color-primary-hover;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
   }
 
   &:active {

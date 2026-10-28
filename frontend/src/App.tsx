@@ -67,11 +67,18 @@ export const App: React.FC = () => {
               </main>
 
               <footer className={styles.footer}>
-                <div className="container">
-                  Tienda en Línea Modular · Proyecto de aula ·{' '}
-                  <a href={`${API_BASE_URL}/docs`} target="_blank" rel="noreferrer">
-                    Documentación de la API
-                  </a>
+                <div className={`container ${styles.footerInner}`}>
+                  <div>
+                    <span className={styles.footerBrand}>Modular</span>
+                    <p className={styles.footerText}>Tienda en línea · Proyecto de aula</p>
+                  </div>
+                  <nav className={styles.footerLinks} aria-label="Enlaces del pie de página">
+                    <a href="/">Catálogo</a>
+                    <a href="/carrito">Carrito</a>
+                    <a href={`${API_BASE_URL}/docs`} target="_blank" rel="noreferrer">
+                      Documentación de la API
+                    </a>
+                  </nav>
                 </div>
               </footer>
             </div>

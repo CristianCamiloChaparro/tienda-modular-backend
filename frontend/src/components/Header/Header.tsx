@@ -28,27 +28,9 @@ export const Header: React.FC = () => {
   return (
     <header className={styles.header}>
       <div className={`container ${styles.inner}`}>
-        <Link to="/" className={styles.brand}>
-          <div className={styles.iconWrapper} aria-hidden="true">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-2Z" />
-              <path d="M3 6h18" />
-              <path d="M16 10a4 4 0 0 1-8 0" />
-            </svg>
-          </div>
-          <div className={styles.textGroup}>
-            <span className={styles.title}>Tienda en Línea Modular</span>
-            <span className={styles.subtitle}>Catálogo, carrito y pagos en línea</span>
-          </div>
+        <Link to="/" className={styles.brand} aria-label="Modular, inicio">
+          <span className={styles.wordmark}>Modular</span>
+          <span className={styles.tagline}>tienda en línea</span>
         </Link>
 
         <nav className={styles.nav} aria-label="Navegación principal">
@@ -69,22 +51,10 @@ export const Header: React.FC = () => {
 
         <div className={styles.actions}>
           <Link to="/carrito" className={styles.cartLink} aria-label={`Carrito, ${totalUnidades} productos`}>
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="8" cy="21" r="1" />
-              <circle cx="19" cy="21" r="1" />
-              <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-            </svg>
-            {totalUnidades > 0 && <span className={styles.cartBadge}>{totalUnidades}</span>}
+            Carrito
+            <span className={`${styles.cartCount} ${totalUnidades > 0 ? styles.cartCountActive : ''}`}>
+              {totalUnidades}
+            </span>
           </Link>
 
           {usuario ? (
@@ -93,16 +63,16 @@ export const Header: React.FC = () => {
                 {usuario.nombre}
                 {esAdmin && <span className={styles.roleBadge}>Admin</span>}
               </span>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={handleLogout}>
+              <button type="button" className={styles.textLink} onClick={handleLogout}>
                 Salir
               </button>
             </div>
           ) : (
             <div className={styles.user}>
-              <Link to="/login" className="btn btn-secondary btn-sm">
+              <Link to="/login" className={styles.textLink}>
                 Ingresar
               </Link>
-              <Link to="/registro" className="btn btn-primary btn-sm">
+              <Link to="/registro" className={`btn btn-primary btn-sm ${styles.registerBtn}`}>
                 Crear cuenta
               </Link>
             </div>
