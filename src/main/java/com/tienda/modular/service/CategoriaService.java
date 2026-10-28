@@ -42,7 +42,7 @@ public class CategoriaService {
     public CategoriaResponse crearCategoria(CategoriaRequest datos) {
         String nombre = nombreLimpio(datos.nombre());
         if (categoriaRepository.existsByNombreIgnoreCase(nombre)) {
-            throw new ReglaNegocioException("Ya existe una categoria con el nombre '" + nombre + "'");
+            throw new ReglaNegocioException("Ya existe una categoría con el nombre '" + nombre + "'");
         }
         Categoria categoria = new Categoria(nombre, TextoSeguro.limpiar(datos.descripcion()));
         return CategoriaResponse.desde(categoriaRepository.save(categoria));
@@ -53,7 +53,7 @@ public class CategoriaService {
         Categoria categoria = buscarEntidad(id);
         String nombre = nombreLimpio(datos.nombre());
         if (categoriaRepository.existsByNombreIgnoreCaseAndIdNot(nombre, id)) {
-            throw new ReglaNegocioException("Ya existe una categoria con el nombre '" + nombre + "'");
+            throw new ReglaNegocioException("Ya existe una categoría con el nombre '" + nombre + "'");
         }
         categoria.setNombre(nombre);
         categoria.setDescripcion(TextoSeguro.limpiar(datos.descripcion()));
@@ -73,14 +73,14 @@ public class CategoriaService {
     @Transactional(readOnly = true)
     public Categoria buscarEntidad(Long id) {
         return categoriaRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Categoria con id " + id + " no encontrada"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Categoría con id " + id + " no encontrada"));
     }
 
     /** Quita HTML del nombre (mitigacion XSS); si no queda texto, es un dato invalido. */
     private String nombreLimpio(String nombre) {
         String limpio = TextoSeguro.limpiar(nombre);
         if (limpio == null) {
-            throw new DatoInvalidoException("nombre", "El nombre no puede quedar vacio ni contener solo HTML");
+            throw new DatoInvalidoException("nombre", "El nombre no puede quedar vacío ni contener solo HTML");
         }
         return limpio;
     }

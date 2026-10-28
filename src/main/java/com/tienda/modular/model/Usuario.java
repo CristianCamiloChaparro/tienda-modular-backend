@@ -33,6 +33,17 @@ public class Usuario {
     @Column(name = "creado_en", nullable = false, updatable = false)
     private LocalDateTime creadoEn;
 
+    /** Secreto TOTP (Base32) de la verificacion en dos pasos; null si nunca se configuro. */
+    @Column(name = "totp_secreto", length = 64)
+    private String totpSecreto;
+
+    @Column(name = "totp_activo", nullable = false, columnDefinition = "boolean default false")
+    private boolean totpActivo;
+
+    /** Ultimo intervalo de 30 s aceptado: impide reutilizar el mismo codigo. */
+    @Column(name = "totp_ultimo_paso")
+    private Long totpUltimoPaso;
+
     public Usuario() {
     }
 
@@ -63,4 +74,13 @@ public class Usuario {
     public void setRol(Rol rol) { this.rol = rol; }
 
     public LocalDateTime getCreadoEn() { return creadoEn; }
+
+    public String getTotpSecreto() { return totpSecreto; }
+    public void setTotpSecreto(String totpSecreto) { this.totpSecreto = totpSecreto; }
+
+    public boolean isTotpActivo() { return totpActivo; }
+    public void setTotpActivo(boolean totpActivo) { this.totpActivo = totpActivo; }
+
+    public Long getTotpUltimoPaso() { return totpUltimoPaso; }
+    public void setTotpUltimoPaso(Long totpUltimoPaso) { this.totpUltimoPaso = totpUltimoPaso; }
 }

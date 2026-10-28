@@ -40,10 +40,20 @@ public class GlobalExceptionHandler {
         return construir(HttpStatus.PAYMENT_REQUIRED, ex.getMessage(), req, null);
     }
 
+    @ExceptionHandler(NoAutorizadoException.class)
+    public ResponseEntity<ApiError> noAutorizado(NoAutorizadoException ex, HttpServletRequest req) {
+        return construir(HttpStatus.UNAUTHORIZED, ex.getMessage(), req, null);
+    }
+
+    @ExceptionHandler(DemasiadosIntentosException.class)
+    public ResponseEntity<ApiError> demasiadosIntentos(DemasiadosIntentosException ex, HttpServletRequest req) {
+        return construir(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), req, null);
+    }
+
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiError> credenciales(AuthenticationException ex, HttpServletRequest req) {
         // Mismo mensaje si el correo no existe o si la clave es incorrecta: no revela que cuentas existen.
-        return construir(HttpStatus.UNAUTHORIZED, "Correo o contrasena incorrectos", req, null);
+        return construir(HttpStatus.UNAUTHORIZED, "Correo o contraseña incorrectos", req, null);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -57,24 +67,24 @@ public class GlobalExceptionHandler {
         for (FieldError fe : ex.getBindingResult().getFieldErrors()) {
             campos.putIfAbsent(fe.getField(), fe.getDefaultMessage());
         }
-        return construir(HttpStatus.BAD_REQUEST, "Hay datos invalidos en la solicitud", req, campos);
+        return construir(HttpStatus.BAD_REQUEST, "Hay datos inválidos en la solicitud", req, campos);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiError> jsonInvalido(HttpMessageNotReadableException ex, HttpServletRequest req) {
-        return construir(HttpStatus.BAD_REQUEST, "El cuerpo JSON esta mal formado o tiene tipos incorrectos", req, null);
+        return construir(HttpStatus.BAD_REQUEST, "El cuerpo JSON está mal formado o tiene tipos incorrectos", req, null);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiError> tipoParametro(MethodArgumentTypeMismatchException ex, HttpServletRequest req) {
         return construir(HttpStatus.BAD_REQUEST,
-                "El parametro '" + ex.getName() + "' tiene un valor invalido", req, null);
+                "El parámetro '" + ex.getName() + "' tiene un valor inválido", req, null);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiError> integridad(DataIntegrityViolationException ex, HttpServletRequest req) {
         return construir(HttpStatus.CONFLICT,
-                "La operacion viola una restriccion de integridad de la base de datos", req, null);
+                "La operación viola una restricción de integridad de la base de datos", req, null);
     }
 
     private ResponseEntity<ApiError> construir(HttpStatus status, String mensaje,

@@ -27,15 +27,15 @@ public class ErroresSeguridadJson implements AuthenticationEntryPoint, AccessDen
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException ex) throws IOException {
-        escribir(response, request, HttpStatus.UNAUTHORIZED, "Debes iniciar sesion para realizar esta operacion");
+        escribir(response, request, HttpStatus.UNAUTHORIZED, "Debes iniciar sesión para realizar esta operación");
     }
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        AccessDeniedException ex) throws IOException {
         String mensaje = ex instanceof CsrfException
-                ? "Token CSRF ausente o invalido: la peticion fue bloqueada"
-                : "No tienes permisos para realizar esta operacion";
+                ? "Token CSRF ausente o inválido: la petición fue bloqueada"
+                : "No tienes permisos para realizar esta operación";
         escribir(response, request, HttpStatus.FORBIDDEN, mensaje);
     }
 

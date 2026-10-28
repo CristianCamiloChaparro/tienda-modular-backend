@@ -29,10 +29,10 @@ public class PasarelaPagoSimulada implements PasarelaPago {
     public ResultadoPago cobrar(BigDecimal monto, PagoRequest pago, String descripcion) {
         String numero = pago.numeroTarjeta().replaceAll("[ -]", "");
         if (numero.length() < 13 || numero.length() > 19 || !pasaLuhn(numero)) {
-            throw new DatoInvalidoException("pago.numeroTarjeta", "El numero de tarjeta no es valido");
+            throw new DatoInvalidoException("pago.numeroTarjeta", "El número de tarjeta no es válido");
         }
         if (YearMonth.of(pago.anioExpiracion(), pago.mesExpiracion()).isBefore(YearMonth.now())) {
-            throw new DatoInvalidoException("pago.anioExpiracion", "La tarjeta esta vencida");
+            throw new DatoInvalidoException("pago.anioExpiracion", "La tarjeta está vencida");
         }
 
         String ultimos4 = numero.substring(numero.length() - 4);

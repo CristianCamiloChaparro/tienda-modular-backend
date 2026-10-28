@@ -66,7 +66,7 @@ Se aplica **defensa en profundidad**, en tres capas:
 # Sin token: bloqueado aunque los datos sean válidos
 curl -i -X POST https://<dominio>/api/v1/auth/login \
   -H 'Content-Type: application/json' -d '{"email":"admin@tienda.com","password":"..."}'
-# -> 403 {"mensaje":"Token CSRF ausente o invalido: la peticion fue bloqueada"}
+# -> 403 {"mensaje":"Token CSRF ausente o inválido: la petición fue bloqueada"}
 ```
 En el navegador: DevTools → Network → cualquier `POST` de la aplicación → *Request Headers* → `X-XSRF-TOKEN`.
 
@@ -82,7 +82,26 @@ Página atacante de ejemplo (guardarla como `ataque.html`, abrirla desde otro or
 
 ---
 
-## 4. Otras medidas
+## 4. Recuperar contraseña y verificación en dos pasos
+
+**Olvidé mi contraseña** (`/olvide-contrasena` → correo → `/restablecer?token=...`)
+- El enlace lleva un token aleatorio de 256 bits. En la base solo se guarda su hash SHA-256 (`tokens_restablecimiento`): quien lea la base no puede usar los enlaces.
+- Vence a los 30 minutos y sirve una sola vez; al usarlo, o al pedir uno nuevo, se invalidan los demás.
+- La respuesta es la misma exista o no la cuenta (no revela qué correos están registrados) y se envía como máximo un correo por minuto a cada cuenta.
+- El correo sale por la API HTTPS de Brevo. Sin `BREVO_API_KEY`, el enlace se escribe en el log del servidor (útil en desarrollo).
+
+**Verificación en dos pasos (2FA)** (`Mi cuenta` → *Configurar verificación en dos pasos*)
+- Códigos TOTP del RFC 6238 (los de Google Authenticator, Microsoft Authenticator o Authy): 6 dígitos que cambian cada 30 s. Implementado y probado contra los vectores oficiales del RFC (`TotpTest`).
+- Se activa escaneando un QR y confirmando con un código; para desactivarla se pide un código vigente.
+- Con 2FA activa, la contraseña correcta deja la sesión **pendiente** (HTTP 202): no hay acceso hasta enviar el código a `/auth/login/2fa`. La espera vence a los 5 minutos y admite 5 intentos; después hay que volver a escribir la contraseña.
+- Un código ya usado no sirve otra vez (se guarda el último intervalo aceptado).
+- En *Mi cuenta*, 5 intentos fallidos de contraseña o código cierran la sesión.
+
+**Pruebas:** `CuentaIntegrationTest` (enlace de un solo uso, cambio de contraseña, login en dos pasos, límite de intentos) y `TotpTest`.
+
+---
+
+## 5. Otras medidas
 
 | Medida | Detalle |
 |---|---|

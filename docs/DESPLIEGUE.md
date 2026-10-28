@@ -72,6 +72,14 @@ Opción automática: **New → Blueprint** → este repositorio. `render.yaml` c
 
 En ambos casos se abre la URL del frontend; Swagger también queda disponible en `<url-del-frontend>/api/v1/docs`.
 
+**Correo para "olvidé mi contraseña"** (opcional; sin esto el enlace queda en *Logs* del backend)
+1. Crear cuenta gratis en [brevo.com](https://www.brevo.com) (300 correos al día).
+2. *Senders, Domains & Dedicated IPs* → *Senders* → agregar y verificar el correo remitente (llega un código a ese correo).
+3. *SMTP & API* → *API Keys* → *Generate a new API key*.
+4. En `tienda-backend` → *Environment*: `BREVO_API_KEY` = la clave, `MAIL_FROM` = el correo verificado, `APP_URL` = `https://tienda-frontend-v18v.onrender.com`.
+
+Se usa la API HTTPS de Brevo y no SMTP porque el plan gratuito de Render bloquea los puertos SMTP.
+
 **Notas del plan gratuito**
 - Los servicios se "duermen" tras 15 minutos sin uso; la primera visita tarda ~1 minuto. **Abrir la aplicación unos minutos antes de la sustentación.**
 - La base de datos gratuita de Render vence a los 30 días. Alternativa sin vencimiento: [Neon](https://neon.tech) y en `tienda-backend` definir `DB_URL=jdbc:postgresql://<host>/<db>?sslmode=require`, `DB_USER`, `DB_PASSWORD`.
@@ -90,6 +98,9 @@ En ambos casos se abre la URL del frontend; Swagger también queda disponible en
 | `ADMIN_PASSWORD` | *(sin valor)* | Contraseña del administrador inicial. Si no se define, no se crea ninguno |
 | `COOKIE_SECURE` | `false` | `true` en producción (cookies solo por HTTPS) |
 | `REQUIRE_HTTPS` | `false` | `true` para redirigir toda petición HTTP a HTTPS |
+| `APP_URL` | `http://localhost:5173` | URL pública del frontend; con ella se arma el enlace de "olvidé mi contraseña" |
+| `BREVO_API_KEY` | *(sin valor)* | Clave de la API de Brevo para enviar correos. Sin ella el enlace se escribe en el log |
+| `MAIL_FROM` / `MAIL_FROM_NAME` | *(sin valor)* / `Tienda` | Remitente verificado en Brevo |
 | `CORS_ORIGINS` | `http://localhost:5173` | Solo si el frontend llama a la API desde otro dominio |
 | `SHOW_SQL` | `false` | Mostrar el SQL de Hibernate en consola |
 
@@ -110,5 +121,5 @@ En ambos casos se abre la URL del frontend; Swagger también queda disponible en
 - [ ] Agregar al carrito, cambiar cantidades y ver el total recalculado.
 - [ ] Crear cuenta → pagar con `4000 0000 0000 0002` (rechazado) y luego con `4242 4242 4242 4242` (aprobado) → Mis pedidos.
 - [ ] Ingresar como administrador → crear un producto desde el formulario → verlo en el catálogo.
-- [ ] Seguridad: seguir [`SEGURIDAD.md`](SEGURIDAD.md) (HTTPS, XSS, CSRF).
+- [ ] Seguridad: seguir [`SEGURIDAD.md`](SEGURIDAD.md) (HTTPS, XSS, CSRF, olvidé mi contraseña y 2FA).
 - [ ] Swagger: `/api/v1/docs`.

@@ -99,12 +99,12 @@ class ProductoControllerTest {
     @DisplayName("GET /api/v1/productos?categoriaId={id} -> 404 Not Found si categoria no existe")
     void listar_conCategoriaIdInexistente_retorna404() throws Exception {
         when(productoService.listar(99L))
-                .thenThrow(new RecursoNoEncontradoException("Categoria con id 99 no encontrada"));
+                .thenThrow(new RecursoNoEncontradoException("Categoría con id 99 no encontrada"));
 
         mockMvc.perform(get("/api/v1/productos").param("categoriaId", "99"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status", is(404)))
-                .andExpect(jsonPath("$.mensaje", is("Categoria con id 99 no encontrada")));
+                .andExpect(jsonPath("$.mensaje", is("Categoría con id 99 no encontrada")));
 
         verify(productoService).listar(99L);
     }
@@ -224,14 +224,14 @@ class ProductoControllerTest {
         );
 
         when(productoService.crearProducto(any(ProductoRequest.class)))
-                .thenThrow(new RecursoNoEncontradoException("Categoria con id 99 no encontrada"));
+                .thenThrow(new RecursoNoEncontradoException("Categoría con id 99 no encontrada"));
 
         mockMvc.perform(post("/api/v1/productos").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status", is(404)))
-                .andExpect(jsonPath("$.mensaje", is("Categoria con id 99 no encontrada")));
+                .andExpect(jsonPath("$.mensaje", is("Categoría con id 99 no encontrada")));
 
         verify(productoService).crearProducto(any(ProductoRequest.class));
     }
@@ -343,14 +343,14 @@ class ProductoControllerTest {
         );
 
         when(productoService.actualizarProducto(eq(1L), any(ProductoRequest.class)))
-                .thenThrow(new RecursoNoEncontradoException("Categoria con id 99 no encontrada"));
+                .thenThrow(new RecursoNoEncontradoException("Categoría con id 99 no encontrada"));
 
         mockMvc.perform(put("/api/v1/productos/1").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status", is(404)))
-                .andExpect(jsonPath("$.mensaje", is("Categoria con id 99 no encontrada")));
+                .andExpect(jsonPath("$.mensaje", is("Categoría con id 99 no encontrada")));
 
         verify(productoService).actualizarProducto(eq(1L), any(ProductoRequest.class));
     }

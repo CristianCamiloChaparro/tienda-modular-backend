@@ -15,25 +15,25 @@ public record PagoRequest(
         String titular,
 
         @Schema(example = "4242 4242 4242 4242")
-        @NotBlank(message = "El numero de tarjeta es obligatorio")
-        @Pattern(regexp = "^[0-9 -]{13,23}$", message = "El numero de tarjeta solo puede tener digitos")
+        @NotBlank(message = "El número de tarjeta es obligatorio")
+        @Pattern(regexp = "^[0-9 -]{13,23}$", message = "El número de tarjeta solo puede tener dígitos")
         String numeroTarjeta,
 
         @Schema(example = "12")
-        @NotNull(message = "El mes de expiracion es obligatorio")
-        @Min(value = 1, message = "Mes invalido")
-        @Max(value = 12, message = "Mes invalido")
+        @NotNull(message = "El mes de expiración es obligatorio")
+        @Min(value = 1, message = "Mes inválido")
+        @Max(value = 12, message = "Mes inválido")
         Integer mesExpiracion,
 
         @Schema(example = "2030")
-        @NotNull(message = "El anio de expiracion es obligatorio")
-        @Min(value = 2000, message = "Anio invalido")
-        @Max(value = 2100, message = "Anio invalido")
+        @NotNull(message = "El año de expiración es obligatorio")
+        @Min(value = 2000, message = "Año inválido")
+        @Max(value = 2100, message = "Año inválido")
         Integer anioExpiracion,
 
         @Schema(example = "123")
         @NotBlank(message = "El CVV es obligatorio")
-        @Pattern(regexp = "^[0-9]{3,4}$", message = "El CVV debe tener 3 o 4 digitos")
+        @Pattern(regexp = "^[0-9]{3,4}$", message = "El CVV debe tener 3 o 4 dígitos")
         String cvv
 ) {
     @Override

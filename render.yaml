@@ -32,6 +32,13 @@ services:
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
+      # Olvide mi contrasena: URL publica del frontend (para el enlace del correo) y API de Brevo
+      - key: APP_URL
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: MAIL_FROM
+        sync: false
 
   - type: web
     name: tienda-frontend

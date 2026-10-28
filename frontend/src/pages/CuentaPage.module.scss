@@ -1,0 +1,165 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.lista {
+  @include flex-column;
+  padding-bottom: $spacing-3xl;
+}
+
+.bloque {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: $spacing-xl;
+  padding: $spacing-xl 0;
+  border-top: 1px solid $color-border;
+
+  @include respond-to(tablet) {
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+  }
+}
+
+.bloqueTitulo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $spacing-sm + 2;
+  @include display(1.4rem);
+  margin-bottom: $spacing-sm;
+}
+
+.bloqueAyuda {
+  color: $color-text-muted;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  max-width: 42ch;
+
+  a {
+    color: $color-text-main;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.estado {
+  font-family: $font-family-base;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: $radius-full;
+  background: $color-bg-surface;
+  color: $color-text-muted;
+}
+
+.estadoActivo {
+  background: $color-success-bg;
+  color: $color-success;
+}
+
+.formulario {
+  @include panel;
+  max-width: 520px;
+
+  > button {
+    align-self: flex-start;
+  }
+}
+
+.datos {
+  @include panel;
+  max-width: 520px;
+  display: grid;
+  gap: $spacing-md;
+
+  dt {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: $color-text-light;
+    margin-bottom: 2px;
+  }
+
+  dd {
+    font-weight: 600;
+    word-break: break-word;
+  }
+}
+
+.activa {
+  @include flex-column;
+  align-items: flex-start;
+  gap: $spacing-md;
+  color: $color-text-muted;
+  font-size: 0.9rem;
+}
+
+.paso {
+  color: $color-text-muted;
+  font-size: 0.9rem;
+  margin-bottom: $spacing-md;
+}
+
+.acciones {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.pasos {
+  @include flex-column;
+  gap: $spacing-lg;
+  padding-left: 1.2em;
+  margin-bottom: $spacing-md;
+  font-size: 0.9rem;
+  color: $color-text-muted;
+
+  strong {
+    color: $color-text-main;
+  }
+
+  li::marker {
+    color: $color-accent;
+    font-weight: 700;
+  }
+
+  :global(.field) {
+    margin-top: $spacing-sm;
+    max-width: 260px;
+  }
+}
+
+.qrFila {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  margin-top: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.qr {
+  width: 168px;
+  height: 168px;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  background: $color-bg-card;
+}
+
+.clave {
+  @include flex-column;
+  align-items: flex-start;
+  gap: $spacing-xs + 2;
+  font-size: 0.8rem;
+  min-width: 0;
+
+  code {
+    font-family: $font-family-mono;
+    font-size: 0.85rem;
+    color: $color-text-main;
+    background: $color-bg-surface;
+    padding: 6px 10px;
+    border-radius: $radius-md;
+    word-break: break-all;
+  }
+}

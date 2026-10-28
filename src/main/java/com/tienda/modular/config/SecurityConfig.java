@@ -20,7 +20,7 @@ import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWrite
  * Reglas de seguridad de la API:
  * - Catalogo (GET) y carrito: publicos.
  * - Crear/editar/eliminar categorias y productos, ver todos los pedidos: solo ADMIN.
- * - Pagar y ver mis pedidos: usuario autenticado.
+ * - Pagar, ver mis pedidos y la seguridad de la cuenta (/auth/cuenta): usuario autenticado.
  * - CSRF activo en todo POST/PUT/PATCH/DELETE (cookie XSRF-TOKEN + cabecera X-XSRF-TOKEN).
  * - Cabeceras contra XSS y clickjacking (CSP, X-Frame-Options, nosniff) y HSTS sobre HTTPS.
  */
@@ -77,6 +77,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/error").permitAll()
                         .requestMatchers("/api/v1/docs", "/api/v1/docs/**", "/api/v1/api-docs/**",
                                 "/swagger-ui/**", "/swagger-ui.html", "/api/v1/swagger-ui/**").permitAll()
+                        .requestMatchers("/api/v1/auth/cuenta/**").authenticated()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/carritos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categorias/**", "/api/v1/productos/**").permitAll()

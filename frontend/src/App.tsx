@@ -12,6 +12,9 @@ import { LoginPage } from './pages/LoginPage';
 import { RegistroPage } from './pages/RegistroPage';
 import { MisPedidosPage } from './pages/MisPedidosPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { OlvidePasswordPage } from './pages/OlvidePasswordPage';
+import { RestablecerPasswordPage } from './pages/RestablecerPasswordPage';
+import { CuentaPage } from './pages/CuentaPage';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { AdminProductosPage } from './pages/admin/AdminProductosPage';
 import { AdminCategoriasPage } from './pages/admin/AdminCategoriasPage';
@@ -34,6 +37,16 @@ export const App: React.FC = () => {
                   <Route path="/carrito" element={<CarritoPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/registro" element={<RegistroPage />} />
+                  <Route path="/olvide-contrasena" element={<OlvidePasswordPage />} />
+                  <Route path="/restablecer" element={<RestablecerPasswordPage />} />
+                  <Route
+                    path="/cuenta"
+                    element={
+                      <RutaProtegida>
+                        <CuentaPage />
+                      </RutaProtegida>
+                    }
+                  />
                   <Route
                     path="/checkout"
                     element={

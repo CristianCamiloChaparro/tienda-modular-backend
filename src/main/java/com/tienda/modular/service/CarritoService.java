@@ -40,7 +40,7 @@ public class CarritoService {
         Producto producto = productoRepository.findById(productoId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Producto con id " + productoId + " no encontrado"));
         if (!producto.isActivo()) {
-            throw new ReglaNegocioException("El producto '" + producto.getNombre() + "' no esta disponible");
+            throw new ReglaNegocioException("El producto '" + producto.getNombre() + "' no está disponible");
         }
         validarStock(producto, carrito.cantidadDe(productoId) + cantidad);
         carrito.agregarProducto(producto, cantidad);
@@ -55,7 +55,7 @@ public class CarritoService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Producto con id " + productoId + " no encontrado"));
         validarStock(producto, cantidad);
         if (!carrito.modificarCantidad(productoId, cantidad)) {
-            throw new RecursoNoEncontradoException("El producto " + productoId + " no esta en el carrito");
+            throw new RecursoNoEncontradoException("El producto " + productoId + " no está en el carrito");
         }
         carrito.sincronizarPrecios();
         return CarritoResponse.desde(carritoRepository.save(carrito));
@@ -65,7 +65,7 @@ public class CarritoService {
     public CarritoResponse eliminarProducto(String id, Long productoId) {
         Carrito carrito = buscarEntidad(id);
         if (!carrito.eliminarProducto(productoId)) {
-            throw new RecursoNoEncontradoException("El producto " + productoId + " no esta en el carrito");
+            throw new RecursoNoEncontradoException("El producto " + productoId + " no está en el carrito");
         }
         carrito.sincronizarPrecios();
         return CarritoResponse.desde(carritoRepository.save(carrito));

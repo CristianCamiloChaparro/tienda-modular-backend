@@ -53,6 +53,11 @@
     gap: $spacing-md;
     padding: $spacing-sm 0 $spacing-sm;
     overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  @include respond-to(mobile) {
+    gap: $spacing-md - 2;
   }
 }
 
@@ -60,8 +65,14 @@
   position: relative;
   padding: 6px 0;
   font-size: 0.9rem;
+  white-space: nowrap;
+  flex-shrink: 0;
   color: $color-text-muted;
   transition: color $transition-fast;
+
+  @include respond-to(mobile) {
+    font-size: 0.85rem;
+  }
 
   &:hover {
     color: $color-text-main;
@@ -138,6 +149,12 @@
   @include respond-to(mobile) {
     display: none;
   }
+}
+
+.userName:hover {
+  color: $color-text-main;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .roleBadge {

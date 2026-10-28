@@ -41,6 +41,11 @@ export const Header: React.FC = () => {
               Mis pedidos
             </NavLink>
           )}
+          {usuario && (
+            <NavLink to="/cuenta" className={claseEnlace}>
+              Mi cuenta
+            </NavLink>
+          )}
           {esAdmin && (
             <NavLink to="/admin" className={claseEnlace}>
               Administrar
@@ -58,10 +63,10 @@ export const Header: React.FC = () => {
 
           {usuario ? (
             <div className={styles.user}>
-              <span className={styles.userName} title={usuario.email}>
+              <Link to="/cuenta" className={styles.userName} title={`Mi cuenta (${usuario.email})`}>
                 {usuario.nombre}
                 {esAdmin && <span className={styles.roleBadge}>Admin</span>}
-              </span>
+              </Link>
               <button type="button" className={styles.textLink} onClick={handleLogout}>
                 Salir
               </button>

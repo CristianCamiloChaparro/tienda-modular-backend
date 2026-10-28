@@ -1,14 +1,25 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import type { LoginRequest, RegistroRequest, Usuario } from '../types/auth';
-import { cerrarSesion, iniciarSesion, obtenerSesion, registrarse } from '../services/auth';
+import type { DosFactoresRequerido, LoginRequest, RegistroRequest, Usuario } from '../types/auth';
+import {
+  cerrarSesion,
+  esDosFactoresRequerido,
+  iniciarSesion,
+  obtenerSesion,
+  registrarse,
+  verificarCodigoLogin,
+} from '../services/auth';
 
 interface AuthContextValue {
   usuario: Usuario | null;
   cargando: boolean;
   esAdmin: boolean;
-  login: (datos: LoginRequest) => Promise<Usuario>;
+  /** Si la cuenta tiene verificación en dos pasos, devuelve DosFactoresRequerido y la sesión queda pendiente. */
+  login: (datos: LoginRequest) => Promise<Usuario | DosFactoresRequerido>;
+  verificarCodigo: (codigo: string) => Promise<Usuario>;
   registro: (datos: RegistroRequest) => Promise<Usuario>;
   logout: () => Promise<void>;
+  /** Actualiza los datos en memoria tras un cambio en Mi cuenta. */
+  actualizarUsuario: (u: Usuario | null) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -30,7 +41,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = useCallback(async (datos: LoginRequest) => {
-    const u = await iniciarSesion(datos);
+    const resultado = await iniciarSesion(datos);
+    if (!esDosFactoresRequerido(resultado)) {
+      setUsuario(resultado);
+    }
+    return resultado;
+  }, []);
+
+  const verificarCodigo = useCallback(async (codigo: string) => {
+    const u = await verificarCodigoLogin(codigo);
     setUsuario(u);
     return u;
   }, []);
@@ -47,8 +66,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const value = useMemo(
-    () => ({ usuario, cargando, esAdmin: usuario?.rol === 'ADMIN', login, registro, logout }),
-    [usuario, cargando, login, registro, logout]
+    () => ({
+      usuario,
+      cargando,
+      esAdmin: usuario?.rol === 'ADMIN',
+      login,
+      verificarCodigo,
+      registro,
+      logout,
+      actualizarUsuario: setUsuario,
+    }),
+    [usuario, cargando, login, verificarCodigo, registro, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

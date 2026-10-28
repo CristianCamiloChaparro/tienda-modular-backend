@@ -16,14 +16,14 @@ public record RegistroRequest(
 
         @Schema(example = "laura@correo.com")
         @NotBlank(message = "El correo es obligatorio")
-        @Email(message = "El correo no tiene un formato valido")
+        @Email(message = "El correo no tiene un formato válido")
         @Size(max = 150, message = "El correo no puede superar 150 caracteres")
         String email,
 
         @Schema(description = "Minimo 8 caracteres, con al menos una letra y un numero", example = "Clave1234")
-        @NotBlank(message = "La contrasena es obligatoria")
-        @Size(min = 8, max = 72, message = "La contrasena debe tener entre 8 y 72 caracteres")
-        @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "La contrasena debe tener al menos una letra y un numero")
+        @NotBlank(message = "La contraseña es obligatoria")
+        @Size(min = 8, max = 72, message = "La contraseña debe tener entre 8 y 72 caracteres")
+        @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "La contraseña debe tener al menos una letra y un número")
         String password
 ) {
 }

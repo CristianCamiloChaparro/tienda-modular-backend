@@ -129,8 +129,7 @@ async function enviar<T>(path: string, opciones: Opciones, reintentar: boolean):
     throw new ApiException(message, response.status, apiError);
   }
 
-  if (response.status === 204) {
-    return undefined as T;
-  }
-  return response.json();
+  // 204, o 202 sin cuerpo: no hay JSON que leer.
+  const texto = await response.text();
+  return (texto ? JSON.parse(texto) : undefined) as T;
 }

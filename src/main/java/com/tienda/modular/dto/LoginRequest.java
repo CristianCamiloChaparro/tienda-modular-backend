@@ -9,11 +9,11 @@ public record LoginRequest(
 
         @Schema(example = "cliente@correo.com")
         @NotBlank(message = "El correo es obligatorio")
-        @Email(message = "El correo no tiene un formato valido")
+        @Email(message = "El correo no tiene un formato válido")
         String email,
 
         @Schema(example = "Clave1234")
-        @NotBlank(message = "La contrasena es obligatoria")
+        @NotBlank(message = "La contraseña es obligatoria")
         String password
 ) {
 }

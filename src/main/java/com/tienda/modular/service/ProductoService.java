@@ -93,7 +93,7 @@ public class ProductoService {
     private String nombreLimpio(String nombre) {
         String limpio = TextoSeguro.limpiar(nombre);
         if (limpio == null) {
-            throw new DatoInvalidoException("nombre", "El nombre no puede quedar vacio ni contener solo HTML");
+            throw new DatoInvalidoException("nombre", "El nombre no puede quedar vacío ni contener solo HTML");
         }
         return limpio;
     }

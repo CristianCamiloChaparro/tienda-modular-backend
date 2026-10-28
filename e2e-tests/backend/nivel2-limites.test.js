@@ -110,7 +110,7 @@ export async function runNivel2Backend(http, reporter) {
       nombre: `Nivel2 Alpha ${timestamp}`, // Name of Cat A
       descripcion: 'Intento de duplicar nombre de otra categoria',
     });
-    Assertions.assertApiError(res, 409, 'Ya existe una categoria');
+    Assertions.assertApiError(res, 409, 'Ya existe una categoría');
     reporter.pass('F1 Corner: PUT categoria con nombre duplicado de otra categoria retorna 409 Conflict');
   } catch (err) {
     reporter.fail('F1 Corner: PUT categoria con nombre duplicado', err);

@@ -1,0 +1,9 @@
+@use '../../styles/variables' as *;
+
+.codigo {
+  font-family: $font-family-mono;
+  font-size: 1.6rem;
+  letter-spacing: 0.5em;
+  text-align: center;
+  padding-left: 0.5em;
+}

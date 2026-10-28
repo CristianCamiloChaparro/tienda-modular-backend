@@ -84,13 +84,13 @@ class CategoriaControllerTest {
     @DisplayName("GET /api/v1/categorias/{id} -> 404 Not Found cuando no existe")
     void obtener_cuandoNoExiste_retorna404() throws Exception {
         when(categoriaService.obtenerPorId(99L))
-                .thenThrow(new RecursoNoEncontradoException("Categoria con id 99 no encontrada"));
+                .thenThrow(new RecursoNoEncontradoException("Categoría con id 99 no encontrada"));
 
         mockMvc.perform(get("/api/v1/categorias/99"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status", is(404)))
                 .andExpect(jsonPath("$.error", is("Not Found")))
-                .andExpect(jsonPath("$.mensaje", is("Categoria con id 99 no encontrada")));
+                .andExpect(jsonPath("$.mensaje", is("Categoría con id 99 no encontrada")));
 
         verify(categoriaService).obtenerPorId(99L);
     }
@@ -135,14 +135,14 @@ class CategoriaControllerTest {
         CategoriaRequest request = new CategoriaRequest("Ropa", "Prendas");
 
         when(categoriaService.crearCategoria(any(CategoriaRequest.class)))
-                .thenThrow(new ReglaNegocioException("Ya existe una categoria con el nombre 'Ropa'"));
+                .thenThrow(new ReglaNegocioException("Ya existe una categoría con el nombre 'Ropa'"));
 
         mockMvc.perform(post("/api/v1/categorias").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status", is(409)))
-                .andExpect(jsonPath("$.mensaje", is("Ya existe una categoria con el nombre 'Ropa'")));
+                .andExpect(jsonPath("$.mensaje", is("Ya existe una categoría con el nombre 'Ropa'")));
 
         verify(categoriaService).crearCategoria(any(CategoriaRequest.class));
     }
@@ -203,14 +203,14 @@ class CategoriaControllerTest {
         CategoriaRequest request = new CategoriaRequest("Ropa Deportiva", "Descripcion");
 
         when(categoriaService.actualizarCategoria(eq(99L), any(CategoriaRequest.class)))
-                .thenThrow(new RecursoNoEncontradoException("Categoria con id 99 no encontrada"));
+                .thenThrow(new RecursoNoEncontradoException("Categoría con id 99 no encontrada"));
 
         mockMvc.perform(put("/api/v1/categorias/99").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status", is(404)))
-                .andExpect(jsonPath("$.mensaje", is("Categoria con id 99 no encontrada")));
+                .andExpect(jsonPath("$.mensaje", is("Categoría con id 99 no encontrada")));
 
         verify(categoriaService).actualizarCategoria(eq(99L), any(CategoriaRequest.class));
     }
@@ -221,14 +221,14 @@ class CategoriaControllerTest {
         CategoriaRequest request = new CategoriaRequest("Accesorios", "Descripcion");
 
         when(categoriaService.actualizarCategoria(eq(1L), any(CategoriaRequest.class)))
-                .thenThrow(new ReglaNegocioException("Ya existe una categoria con el nombre 'Accesorios'"));
+                .thenThrow(new ReglaNegocioException("Ya existe una categoría con el nombre 'Accesorios'"));
 
         mockMvc.perform(put("/api/v1/categorias/1").with(comoAdmin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status", is(409)))
-                .andExpect(jsonPath("$.mensaje", is("Ya existe una categoria con el nombre 'Accesorios'")));
+                .andExpect(jsonPath("$.mensaje", is("Ya existe una categoría con el nombre 'Accesorios'")));
 
         verify(categoriaService).actualizarCategoria(eq(1L), any(CategoriaRequest.class));
     }
@@ -248,13 +248,13 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("DELETE /api/v1/categorias/{id} -> 404 Not Found cuando categoria no existe")
     void eliminar_cuandoNoExiste_retorna404() throws Exception {
-        doThrow(new RecursoNoEncontradoException("Categoria con id 99 no encontrada"))
+        doThrow(new RecursoNoEncontradoException("Categoría con id 99 no encontrada"))
                 .when(categoriaService).eliminarCategoria(99L);
 
         mockMvc.perform(delete("/api/v1/categorias/99").with(comoAdmin()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status", is(404)))
-                .andExpect(jsonPath("$.mensaje", is("Categoria con id 99 no encontrada")));
+                .andExpect(jsonPath("$.mensaje", is("Categoría con id 99 no encontrada")));
 
         verify(categoriaService).eliminarCategoria(99L);
     }
@@ -292,7 +292,7 @@ class CategoriaControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new CategoriaRequest("Libros", null))))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.mensaje", is("No tienes permisos para realizar esta operacion")));
+                .andExpect(jsonPath("$.mensaje", is("No tienes permisos para realizar esta operación")));
 
         verifyNoInteractions(categoriaService);
     }
@@ -302,7 +302,7 @@ class CategoriaControllerTest {
     void eliminar_sinTokenCsrf_retorna403() throws Exception {
         mockMvc.perform(delete("/api/v1/categorias/1").with(user("admin").roles("ADMIN")))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.mensaje", is("Token CSRF ausente o invalido: la peticion fue bloqueada")));
+                .andExpect(jsonPath("$.mensaje", is("Token CSRF ausente o inválido: la petición fue bloqueada")));
 
         verifyNoInteractions(categoriaService);
     }

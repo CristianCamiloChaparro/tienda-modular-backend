@@ -7,6 +7,7 @@ const respuesta = (status: number, body?: unknown) =>
     status,
     statusText: '',
     json: async () => body,
+    text: async () => (body === undefined ? '' : JSON.stringify(body)),
   }) as Response;
 
 describe('Cliente HTTP (src/services/http.ts)', () => {
@@ -60,7 +61,7 @@ describe('Cliente HTTP (src/services/http.ts)', () => {
     document.cookie = 'XSRF-TOKEN=viejo; path=/';
     globalThis.fetch = vi
       .fn()
-      .mockResolvedValueOnce(respuesta(403, { status: 403, mensaje: 'Token CSRF ausente o invalido' }))
+      .mockResolvedValueOnce(respuesta(403, { status: 403, mensaje: 'Token CSRF ausente o inválido' }))
       .mockImplementationOnce(async () => {
         document.cookie = 'XSRF-TOKEN=renovado; path=/';
         return respuesta(200, {});
@@ -79,7 +80,7 @@ describe('Cliente HTTP (src/services/http.ts)', () => {
     document.cookie = 'XSRF-TOKEN=t; path=/';
     globalThis.fetch = vi
       .fn()
-      .mockResolvedValue(respuesta(403, { status: 403, mensaje: 'No tienes permisos para realizar esta operacion' }));
+      .mockResolvedValue(respuesta(403, { status: 403, mensaje: 'No tienes permisos para realizar esta operación' }));
 
     await expect(request('/productos/1', { method: 'DELETE' })).rejects.toThrow(ApiException);
     expect(globalThis.fetch).toHaveBeenCalledTimes(1);
@@ -146,5 +147,17 @@ describe('Cliente HTTP (src/services/http.ts)', () => {
   it('devuelve undefined en respuestas 204 sin cuerpo', async () => {
     globalThis.fetch = vi.fn().mockResolvedValue(respuesta(204));
     await expect(request('/auth/me')).resolves.toBeUndefined();
+  });
+
+  it('devuelve undefined en un 202 sin cuerpo (p. ej. olvidé mi contraseña)', async () => {
+    document.cookie = 'XSRF-TOKEN=abc; path=/';
+    globalThis.fetch = vi.fn().mockResolvedValue(respuesta(202));
+    await expect(request('/auth/password/olvido', { method: 'POST', body: { email: 'a@b.co' } })).resolves.toBeUndefined();
+  });
+
+  it('lee el JSON de un 202 con cuerpo (login que pide el segundo factor)', async () => {
+    document.cookie = 'XSRF-TOKEN=abc; path=/';
+    globalThis.fetch = vi.fn().mockResolvedValue(respuesta(202, { requiereDosFactores: true }));
+    await expect(request('/auth/login', { method: 'POST', body: {} })).resolves.toEqual({ requiereDosFactores: true });
   });
 });

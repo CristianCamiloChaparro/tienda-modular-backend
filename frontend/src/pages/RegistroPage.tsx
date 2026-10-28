@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { CampoPassword } from '../components/CampoPassword/CampoPassword';
+import { passwordValida } from '../utils/password';
 import { erroresDeCampos, mensajeDeError } from '../utils/formato';
 import styles from './AuthPage.module.scss';
 
@@ -26,6 +28,10 @@ export const RegistroPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!passwordValida(password)) {
+      setCampos({ password: 'La contraseña no cumple los requisitos' });
+      return;
+    }
     if (password !== confirmacion) {
       setCampos({ confirmacion: 'Las contraseñas no coinciden' });
       return;
@@ -89,40 +95,23 @@ export const RegistroPage: React.FC = () => {
           />
           {errorDe('email')}
         </div>
-        <div className="field">
-          <label htmlFor="password">Contraseña</label>
-          <input
-            id="password"
-            className="input"
-            type="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            minLength={8}
-            maxLength={72}
-            required
-            aria-invalid={Boolean(campos.password)}
-            aria-describedby="password-hint"
-          />
-          <span className="field-hint" id="password-hint">
-            Mínimo 8 caracteres, con al menos una letra y un número.
-          </span>
-          {errorDe('password')}
-        </div>
-        <div className="field">
-          <label htmlFor="confirmacion">Confirmar contraseña</label>
-          <input
-            id="confirmacion"
-            className="input"
-            type="password"
-            autoComplete="new-password"
-            value={confirmacion}
-            onChange={(e) => setConfirmacion(e.target.value)}
-            required
-            aria-invalid={Boolean(campos.confirmacion)}
-          />
-          {errorDe('confirmacion')}
-        </div>
+        <CampoPassword
+          id="password"
+          label="Contraseña"
+          value={password}
+          onChange={setPassword}
+          autoComplete="new-password"
+          error={campos.password}
+          conRequisitos
+        />
+        <CampoPassword
+          id="confirmacion"
+          label="Confirmar contraseña"
+          value={confirmacion}
+          onChange={setConfirmacion}
+          autoComplete="new-password"
+          error={campos.confirmacion}
+        />
 
         <button type="submit" className="btn btn-primary btn-block" disabled={enviando}>
           {enviando ? 'Creando cuenta...' : 'Crear cuenta'}

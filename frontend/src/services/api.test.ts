@@ -25,6 +25,7 @@ describe('API Service (src/services/api.ts)', () => {
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => mockCategorias,
+      text: async () => JSON.stringify(mockCategorias),
     } as Response);
 
     const result = await getCategorias();
@@ -54,6 +55,7 @@ describe('API Service (src/services/api.ts)', () => {
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => mockProductos,
+      text: async () => JSON.stringify(mockProductos),
     } as Response);
 
     const result = await getProductos();
@@ -83,6 +85,7 @@ describe('API Service (src/services/api.ts)', () => {
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => mockProductos,
+      text: async () => JSON.stringify(mockProductos),
     } as Response);
 
     const result = await getProductos(5);
@@ -103,12 +106,12 @@ describe('API Service (src/services/api.ts)', () => {
         timestamp: '2026-10-06T00:00:00',
         status: 404,
         error: 'Not Found',
-        mensaje: 'Categoria con id 99 no encontrada',
+        mensaje: 'Categoría con id 99 no encontrada',
         ruta: '/api/v1/productos',
       }),
     } as Response);
 
-    await expect(getProductos(99)).rejects.toThrow('Categoria con id 99 no encontrada');
+    await expect(getProductos(99)).rejects.toThrow('Categoría con id 99 no encontrada');
   });
 
   it('handles network failure with descriptive backend offline message', async () => {

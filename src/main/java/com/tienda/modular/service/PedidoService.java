@@ -49,11 +49,11 @@ public class PedidoService {
     public PedidoResponse pagar(UsuarioAutenticado usuario, CheckoutRequest datos) {
         Carrito carrito = carritoService.buscarEntidad(datos.carritoId());
         if (carrito.getItems().isEmpty()) {
-            throw new ReglaNegocioException("El carrito esta vacio");
+            throw new ReglaNegocioException("El carrito está vacío");
         }
         String direccion = TextoSeguro.limpiar(datos.direccionEnvio());
         if (direccion == null) {
-            throw new DatoInvalidoException("direccionEnvio", "La direccion de envio no puede quedar vacia");
+            throw new DatoInvalidoException("direccionEnvio", "La dirección de envío no puede quedar vacía");
         }
 
         Pedido pedido = new Pedido();

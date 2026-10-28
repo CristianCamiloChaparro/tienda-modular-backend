@@ -15,13 +15,13 @@ public record CheckoutRequest(
         String carritoId,
 
         @Schema(example = "Calle 10 # 20-30, Bogota")
-        @NotBlank(message = "La direccion de envio es obligatoria")
-        @Size(max = 200, message = "La direccion no puede superar 200 caracteres")
+        @NotBlank(message = "La dirección de envío es obligatoria")
+        @Size(max = 200, message = "La dirección no puede superar 200 caracteres")
         String direccionEnvio,
 
         @Schema(example = "3001234567")
-        @NotBlank(message = "El telefono es obligatorio")
-        @Pattern(regexp = "^[0-9+ ]{7,20}$", message = "El telefono solo puede tener digitos, espacios y +")
+        @NotBlank(message = "El teléfono es obligatorio")
+        @Pattern(regexp = "^[0-9+ ]{7,20}$", message = "El teléfono solo puede tener dígitos, espacios y +")
         String telefono,
 
         @NotNull(message = "Los datos de pago son obligatorios")

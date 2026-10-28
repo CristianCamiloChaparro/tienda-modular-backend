@@ -13,7 +13,7 @@ public record CategoriaRequest(
         String nombre,
 
         @Schema(description = "Descripcion breve", example = "Bolsos, gorras y complementos")
-        @Size(max = 255, message = "La descripcion no puede superar 255 caracteres")
+        @Size(max = 255, message = "La descripción no puede superar 255 caracteres")
         String descripcion
 ) {
 }
