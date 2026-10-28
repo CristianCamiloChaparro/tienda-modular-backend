@@ -69,8 +69,8 @@ export const App: React.FC = () => {
               <footer className={styles.footer}>
                 <div className={`container ${styles.footerInner}`}>
                   <div>
-                    <span className={styles.footerBrand}>Modular</span>
-                    <p className={styles.footerText}>Tienda en línea · Proyecto de aula</p>
+                    <span className={styles.footerBrand}>Tienda</span>
+                    <p className={styles.footerText}>Proyecto de aula</p>
                   </div>
                   <nav className={styles.footerLinks} aria-label="Enlaces del pie de página">
                     <a href="/">Catálogo</a>

@@ -28,9 +28,8 @@ export const Header: React.FC = () => {
   return (
     <header className={styles.header}>
       <div className={`container ${styles.inner}`}>
-        <Link to="/" className={styles.brand} aria-label="Modular, inicio">
-          <span className={styles.wordmark}>Modular</span>
-          <span className={styles.tagline}>tienda en línea</span>
+        <Link to="/" className={styles.brand} aria-label="Tienda, inicio">
+          <span className={styles.wordmark}>Tienda</span>
         </Link>
 
         <nav className={styles.nav} aria-label="Navegación principal">

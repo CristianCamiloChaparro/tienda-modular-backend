@@ -43,17 +43,6 @@
   }
 }
 
-.tagline {
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: $color-text-muted;
-
-  @include respond-to(mobile) {
-    display: none;
-  }
-}
-
 .nav {
   display: flex;
   gap: $spacing-lg;
