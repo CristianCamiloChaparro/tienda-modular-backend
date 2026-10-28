@@ -17,12 +17,6 @@
   }
 }
 
-.empty {
-  @include flex-column;
-  align-items: flex-start;
-  gap: $spacing-md;
-}
-
 .sectionTitle {
   font-size: 1.05rem;
   font-weight: 700;

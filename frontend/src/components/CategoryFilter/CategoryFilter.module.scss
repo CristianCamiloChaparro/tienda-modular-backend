@@ -9,7 +9,7 @@
 
   @include respond-to(mobile) {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: $spacing-sm;
   }
 }
@@ -26,11 +26,18 @@
   display: flex;
   align-items: center;
   gap: $spacing-lg;
+  min-width: 0;
+  max-width: 100%;
   overflow-x: auto;
   scrollbar-width: none;
 
   &::-webkit-scrollbar {
     display: none;
+  }
+
+  @include respond-to(mobile) {
+    padding-right: $spacing-xl;
+    mask-image: linear-gradient(to right, #000 85%, transparent);
   }
 }
 

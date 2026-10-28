@@ -36,8 +36,10 @@ export const MisPedidosPage: React.FC = () => {
       {cargando ? (
         <div className="panel" aria-busy="true">Cargando pedidos...</div>
       ) : pedidos.length === 0 && !error ? (
-        <div className={`panel ${styles.empty}`}>
-          <p>Todavía no tienes pedidos.</p>
+        <div className="vacio">
+          <span className="vacio-marca">Pedidos</span>
+          <h2 className="vacio-titulo">Todavía no tienes pedidos</h2>
+          <p className="vacio-texto">Cuando pagues una compra, el pedido aparecerá aquí con su estado y referencia de pago.</p>
           <Link to="/" className="btn btn-primary">
             Ir al catálogo
           </Link>

@@ -47,8 +47,10 @@ export const CarritoPage: React.FC = () => {
       {cargando && !carrito ? (
         <div className="panel" aria-busy="true">Cargando carrito...</div>
       ) : items.length === 0 ? (
-        <div className={`panel ${styles.empty}`}>
-          <p>Tu carrito está vacío.</p>
+        <div className="vacio">
+          <span className="vacio-marca">Carrito</span>
+          <h2 className="vacio-titulo">Tu carrito está vacío</h2>
+          <p className="vacio-texto">Agrega productos desde el catálogo; aquí podrás cambiar cantidades y ver el total.</p>
           <Link to="/" className="btn btn-primary">
             Ir al catálogo
           </Link>
@@ -70,17 +72,19 @@ export const CarritoPage: React.FC = () => {
                     <span className={styles.warning}>Máximo disponible: {item.stockDisponible}</span>
                   )}
                 </div>
-                <QuantityStepper
-                  cantidad={item.cantidad}
-                  maximo={item.stockDisponible}
-                  etiqueta={item.nombre}
-                  disabled={ocupado !== null}
-                  onChange={(cantidad) => ejecutar(item.productoId, () => actualizar(item.productoId, cantidad))}
-                />
+                <div className={styles.qty}>
+                  <QuantityStepper
+                    cantidad={item.cantidad}
+                    maximo={item.stockDisponible}
+                    etiqueta={item.nombre}
+                    disabled={ocupado !== null}
+                    onChange={(cantidad) => ejecutar(item.productoId, () => actualizar(item.productoId, cantidad))}
+                  />
+                </div>
                 <strong className={styles.subtotal}>{formatearPrecio(item.subtotal)}</strong>
                 <button
                   type="button"
-                  className="btn btn-ghost btn-sm"
+                  className={`btn btn-ghost btn-sm ${styles.quitar}`}
                   onClick={() => ejecutar(item.productoId, () => quitar(item.productoId))}
                   disabled={ocupado !== null}
                   aria-label={`Quitar ${item.nombre} del carrito`}

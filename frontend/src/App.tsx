@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router';
+import { BrowserRouter, Link, Route, Routes } from 'react-router';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { ToastProvider } from './context/ToastContext';
@@ -70,11 +70,13 @@ export const App: React.FC = () => {
                 <div className={`container ${styles.footerInner}`}>
                   <div>
                     <span className={styles.footerBrand}>Tienda</span>
-                    <p className={styles.footerText}>Proyecto de aula</p>
+                    <p className={styles.footerText}>
+                      Proyecto de aula · Gustavo Andrés Núñez Vega y Cristian Camilo Chaparro
+                    </p>
                   </div>
                   <nav className={styles.footerLinks} aria-label="Enlaces del pie de página">
-                    <a href="/">Catálogo</a>
-                    <a href="/carrito">Carrito</a>
+                    <Link to="/">Catálogo</Link>
+                    <Link to="/carrito">Carrito</Link>
                     <a href={`${API_BASE_URL}/docs`} target="_blank" rel="noreferrer">
                       Documentación de la API
                     </a>

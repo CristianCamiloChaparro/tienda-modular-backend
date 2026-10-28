@@ -1,11 +1,6 @@
 @use '../styles/variables' as *;
 @use '../styles/mixins' as *;
 
-.empty {
-  @include flex-column;
-  align-items: flex-start;
-  gap: $spacing-md;
-}
 
 .list {
   @include flex-column;

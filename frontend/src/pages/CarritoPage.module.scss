@@ -13,11 +13,6 @@
   }
 }
 
-.empty {
-  @include flex-column;
-  align-items: flex-start;
-  gap: $spacing-md;
-}
 
 .items {
   @include flex-column;
@@ -32,8 +27,29 @@
   gap: $spacing-md;
 
   @include respond-to(mobile) {
-    grid-template-columns: 56px 1fr;
-    gap: $spacing-sm;
+    grid-template-columns: 56px auto 1fr auto;
+    grid-template-areas:
+      'thumb info info info'
+      'qty qty subtotal quitar';
+    gap: $spacing-sm $spacing-md;
+
+    .thumb {
+      grid-area: thumb;
+    }
+    .info {
+      grid-area: info;
+    }
+    .qty {
+      grid-area: qty;
+    }
+    .subtotal {
+      grid-area: subtotal;
+      text-align: right;
+      min-width: 0;
+    }
+    .quitar {
+      grid-area: quitar;
+    }
   }
 }
 
@@ -86,9 +102,6 @@
   min-width: 100px;
   text-align: right;
 
-  @include respond-to(mobile) {
-    text-align: left;
-  }
 }
 
 .summary {

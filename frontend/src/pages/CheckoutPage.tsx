@@ -40,8 +40,10 @@ export const CheckoutPage: React.FC = () => {
         <header className="page-header">
           <h1 className="page-title">Pago</h1>
         </header>
-        <div className={`panel ${styles.empty}`}>
-          <p>No hay productos para pagar.</p>
+        <div className="vacio">
+          <span className="vacio-marca">Pago</span>
+          <h2 className="vacio-titulo">No hay productos para pagar</h2>
+          <p className="vacio-texto">Tu carrito está vacío. Agrega productos desde el catálogo para continuar.</p>
           <Link to="/" className="btn btn-primary">
             Ir al catálogo
           </Link>

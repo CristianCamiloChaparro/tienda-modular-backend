@@ -70,7 +70,11 @@
 }
 
 .page-header {
-  padding: $spacing-lg 0 $spacing-md;
+  padding: $spacing-xl 0 $spacing-lg;
+
+  @include respond-to(mobile) {
+    padding: $spacing-lg 0 $spacing-md;
+  }
 }
 
 .page-title {
@@ -78,13 +82,42 @@
   color: $color-text-main;
 
   @include respond-to(mobile) {
-    font-size: 1.4rem;
+    font-size: 1.75rem;
   }
 }
 
 .page-subtitle {
   color: $color-text-muted;
   margin-top: $spacing-xs;
+}
+
+// Estado vacío compartido (carrito, pedidos, catálogo sin resultados, 404)
+.vacio {
+  @include flex-column;
+  align-items: center;
+  text-align: center;
+  gap: $spacing-sm;
+  padding: $spacing-3xl $spacing-md;
+  border-top: 1px solid $color-border;
+  border-bottom: 1px solid $color-border;
+
+  &-marca {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: $color-accent;
+  }
+
+  &-titulo {
+    @include display(1.9rem);
+    color: $color-text-main;
+  }
+
+  &-texto {
+    max-width: 420px;
+    color: $color-text-muted;
+    margin-bottom: $spacing-md;
+  }
 }
 
 .field {
