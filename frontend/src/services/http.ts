@@ -15,7 +15,7 @@ export const MENSAJE_SIN_CONEXION =
 
 /**
  * En el plan gratuito de Render el backend se apaga sin visitas y tarda ~1 minuto en encender.
- * Mientras tanto el proxy responde 502/503/504: las lecturas (GET) se reintentan solas.
+ * Mientras tanto el proxy responde 502/503/504: las peticiones se reintentan solas.
  */
 export const arranqueServidor = { reintentos: 12, esperaMs: 5000 };
 const ESTADOS_ARRANQUE = [502, 503, 504];
@@ -71,20 +71,23 @@ async function leerError(response: Response): Promise<ApiError | undefined> {
 
 export async function request<T>(path: string, opciones: Opciones = {}, reintentar = true): Promise<T> {
   const method = opciones.method ?? 'GET';
-  if (method === 'GET') {
-    for (let intento = 0; ; intento++) {
-      try {
-        return await enviar<T>(path, opciones, reintentar);
-      } catch (err) {
-        const arrancando = err instanceof ApiException && ESTADOS_ARRANQUE.includes(err.status ?? 0);
-        if (!arrancando || intento >= arranqueServidor.reintentos) {
-          throw err;
-        }
-        await esperar(arranqueServidor.esperaMs);
+  for (let intento = 0; ; intento++) {
+    try {
+      return await enviar<T>(path, opciones, reintentar);
+    } catch (err) {
+      const arrancando = err instanceof ApiException && ESTADOS_ARRANQUE.includes(err.status ?? 0);
+      if (!arrancando || intento >= arranqueServidor.reintentos) {
+        throw err;
+      }
+      await esperar(arranqueServidor.esperaMs);
+      // Un 502/503/504 de Render significa que la peticion no llego a la aplicacion (estaba dormida),
+      // asi que repetir una escritura es seguro. Antes se pide un token CSRF nuevo, porque el anterior
+      // pudo no obtenerse mientras el servidor arrancaba.
+      if (method !== 'GET') {
+        await obtenerTokenCsrf(true).catch(() => null);
       }
     }
   }
-  return enviar<T>(path, opciones, reintentar);
 }
 
 async function enviar<T>(path: string, opciones: Opciones, reintentar: boolean): Promise<T> {
@@ -120,7 +123,9 @@ async function enviar<T>(path: string, opciones: Opciones, reintentar: boolean):
     }
     const message =
       apiError?.mensaje ||
-      `Error ${response.status}: ${response.statusText || 'Error en la petición'}`;
+      (ESTADOS_ARRANQUE.includes(response.status)
+        ? MENSAJE_SIN_CONEXION
+        : `Error ${response.status}: ${response.statusText || 'Error en la petición'}`);
     throw new ApiException(message, response.status, apiError);
   }
 

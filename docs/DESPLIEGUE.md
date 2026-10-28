@@ -19,7 +19,7 @@ tienda-modular-backend/
 
 ## A. Desarrollo local
 
-**Requisitos:** Java 21, Node 20+, PostgreSQL con la base `tienda_modular`.
+**Requisitos:** Java 21, Node 22.12+ (lo exige Vitest), PostgreSQL con la base `tienda_modular`.
 
 ```bash
 # Terminal 1 - backend (http://localhost:8080)
@@ -67,7 +67,7 @@ Opción manual (como está desplegado):
 3. **New → Web Service** con el mismo repositorio y **Root Directory `frontend`**, plan Free. Variable: `BACKEND_URL` = URL pública del backend.
 
 Opción automática: **New → Blueprint** → este repositorio. `render.yaml` crea `tienda-db`, `tienda-backend` y `tienda-frontend` (este último desde la carpeta `frontend/`), y pide:
-- `ADMIN_EMAIL` y `ADMIN_PASSWORD`: credenciales del administrador inicial (usar una contraseña nueva, no la de desarrollo).
+- `ADMIN_EMAIL` y `ADMIN_PASSWORD`: credenciales del administrador inicial. La contraseña no tiene valor por defecto: usar una larga y única, y no escribirla en el repositorio.
 - `BACKEND_URL` (frontend): la URL pública del backend.
 
 En ambos casos se abre la URL del frontend; Swagger también queda disponible en `<url-del-frontend>/api/v1/docs`.

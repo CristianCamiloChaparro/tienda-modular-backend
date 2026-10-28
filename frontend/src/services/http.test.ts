@@ -94,16 +94,52 @@ describe('Cliente HTTP (src/services/http.ts)', () => {
       .mockResolvedValueOnce(respuesta(503))
       .mockResolvedValueOnce(respuesta(200, [{ id: 1 }]));
 
-    await expect(request('/categorias')).resolves.toEqual([{ id: 1 }]);
-    expect(globalThis.fetch).toHaveBeenCalledTimes(3);
-    Object.assign(arranqueServidor, original);
+    try {
+      await expect(request('/categorias')).resolves.toEqual([{ id: 1 }]);
+      expect(globalThis.fetch).toHaveBeenCalledTimes(3);
+    } finally {
+      Object.assign(arranqueServidor, original);
+    }
   });
 
-  it('las escrituras no se reintentan ante un 502', async () => {
-    document.cookie = 'XSRF-TOKEN=t; path=/';
-    globalThis.fetch = vi.fn().mockResolvedValue(respuesta(502));
+  it('una escritura que encuentra el servidor dormido (502) se repite con un token CSRF nuevo', async () => {
+    const original = { ...arranqueServidor };
+    Object.assign(arranqueServidor, { reintentos: 3, esperaMs: 0 });
+    try {
+      document.cookie = 'XSRF-TOKEN=viejo; path=/';
+      globalThis.fetch = vi
+        .fn()
+        .mockResolvedValueOnce(respuesta(502))
+        .mockImplementationOnce(async () => {
+          document.cookie = 'XSRF-TOKEN=nuevo; path=/';
+          return respuesta(200, {});
+        })
+        .mockResolvedValueOnce(respuesta(200, { id: 'c1' }));
 
-    await expect(request('/carritos', { method: 'POST' })).rejects.toThrow(ApiException);
+      await expect(request('/carritos', { method: 'POST' })).resolves.toEqual({ id: 'c1' });
+      expect(vi.mocked(globalThis.fetch).mock.calls[2][1]).toMatchObject({
+        headers: { 'X-XSRF-TOKEN': 'nuevo' },
+      });
+    } finally {
+      Object.assign(arranqueServidor, original);
+    }
+  });
+
+  it('si el servidor no despierta, se rinde con un mensaje entendible', async () => {
+    const original = { ...arranqueServidor };
+    Object.assign(arranqueServidor, { reintentos: 2, esperaMs: 0 });
+    try {
+      globalThis.fetch = vi.fn().mockResolvedValue(respuesta(502));
+      await expect(request('/categorias')).rejects.toThrow(/Puede estar iniciando/);
+      expect(globalThis.fetch).toHaveBeenCalledTimes(3);
+    } finally {
+      Object.assign(arranqueServidor, original);
+    }
+  });
+
+  it('un error 500 no se reintenta', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(respuesta(500, { status: 500, mensaje: 'Error interno' }));
+    await expect(request('/categorias')).rejects.toThrow('Error interno');
     expect(globalThis.fetch).toHaveBeenCalledTimes(1);
   });
 

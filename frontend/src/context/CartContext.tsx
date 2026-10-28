@@ -76,22 +76,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [cargarCarrito]);
 
-  // Recupera el carrito guardado al abrir la aplicación.
-  useEffect(() => {
-    const id = leerId();
-    if (!id) {
-      return;
-    }
-    obtenerCarrito(id)
-      .then(setCarrito)
-      .catch((err) => {
-        if (err instanceof ApiException && err.status === 404) {
-          guardarId(null);
-        }
-      })
-      .finally(() => setCargando(false));
-  }, []);
-
   /**
    * Las operaciones se encadenan una tras otra: si el usuario hace clic dos veces seguidas,
    * la segunda espera a la primera. Así no se crean dos carritos ni se muestra una respuesta vieja.
@@ -102,6 +86,25 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     cola.current = resultado.catch(() => undefined);
     return resultado;
   }, []);
+
+  // Recupera el carrito guardado al abrir la aplicación. Va en la cola: si el servidor está
+  // despertando y el usuario agrega algo mientras tanto, esta respuesta no pisa la nueva.
+  useEffect(() => {
+    const id = leerId();
+    if (!id) {
+      return;
+    }
+    enCola(() =>
+      obtenerCarrito(id)
+        .then(setCarrito)
+        .catch((err) => {
+          // Solo se olvida si sigue siendo el mismo carrito (otra operación pudo crear uno nuevo).
+          if (err instanceof ApiException && err.status === 404 && leerId() === id) {
+            guardarId(null);
+          }
+        })
+    ).finally(() => setCargando(false));
+  }, [enCola]);
 
   /** Devuelve el id del carrito, creándolo si aún no existe. */
   const asegurarCarrito = useCallback(async (): Promise<string> => {
